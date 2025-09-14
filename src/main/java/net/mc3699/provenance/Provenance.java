@@ -1,7 +1,7 @@
 package net.mc3699.provenance;
 
 import com.mojang.logging.LogUtils;
-import net.mc3699.provenance.ability.ProvenanceAbilityRegistry;
+import net.mc3699.provenance.ability.utils.ProvenanceAbilityRegistry;
 import net.mc3699.provenance.registry.ProvAbilities;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;

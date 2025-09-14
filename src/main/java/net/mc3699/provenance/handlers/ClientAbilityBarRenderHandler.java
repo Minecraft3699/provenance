@@ -1,9 +1,11 @@
 package net.mc3699.provenance.handlers;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.AbilityDataHandler;
-import net.mc3699.provenance.ability.BaseAbility;
-import net.mc3699.provenance.ability.ClientAbilityInfo;
+import net.mc3699.provenance.ability.base.ToggleAbility;
+import net.mc3699.provenance.ability.utils.AbilityDataHandler;
+import net.mc3699.provenance.ability.base.BaseAbility;
+import net.mc3699.provenance.ability.utils.ClientAbilityInfo;
 import net.mc3699.provenance.util.ProvConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,27 +15,45 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
-import java.util.List;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = Provenance.MODID)
 public class ClientAbilityBarRenderHandler {
 
     private static final ResourceLocation ABILITY_BAR = ProvConstants.path("textures/gui/ability_bar.png");
     private static final ResourceLocation ABILITY_SELECTOR = ProvConstants.path("textures/gui/ability_selection.png");
+    private static final ResourceLocation SLOT_COVER = ProvConstants.path("textures/gui/slot_enabled.png");
+    // 81x4
+    private static final ResourceLocation AP_BAR_EMPTY = ProvConstants.path("textures/gui/ap_bar_empty.png");
+    private static final ResourceLocation AP_BAR_FULL = ProvConstants.path("textures/gui/ap_bar_full.png");
 
 
     @SubscribeEvent
     public static void onRenderGUI(RenderGuiLayerEvent.Post event)
     {
+
+        Minecraft minecraft = Minecraft.getInstance();
+        GuiGraphics graphics = event.getGuiGraphics();
+        int screenWidth = minecraft.getWindow().getGuiScaledWidth();
+        int screenHeight = minecraft.getWindow().getGuiScaledHeight();
+
+        // AP Bar
+        if(event.getName().equals(VanillaGuiLayers.HOTBAR))
+        {
+            float apLevel = AbilityDataHandler.getAPFromTag(ClientAbilityInfo.clientData);
+
+            int apPercent = (int) ((apLevel / AbilityDataHandler.MAX_AP) * 81);
+
+            int apX = (screenWidth / 2) - 180;
+            int apY = (screenHeight - 12);
+            graphics.blit(AP_BAR_EMPTY, apX, apY, 0,0, 81,4,81,4);
+            graphics.blit(AP_BAR_FULL, apX, apY, 0,0, apPercent,4,81,4);
+        }
+
+        // ability selector thing
         if(event.getName().equals(VanillaGuiLayers.HOTBAR) && ClientAbilityBarHandler.isAbilityBarActive())
         {
-            Minecraft minecraft = Minecraft.getInstance();
-            GuiGraphics graphics = event.getGuiGraphics();
-            int screenWidth = minecraft.getWindow().getGuiScaledWidth();
-            int screenHeight = minecraft.getWindow().getGuiScaledHeight();
-
             int x = (screenWidth / 2) - 91;
-            int y = screenHeight - 50;
+            int y = screenHeight - 70;
             graphics.blit(ABILITY_BAR, x, y, 0, 0, 182, 22, 182, 22);
 
             // render icons
@@ -47,8 +67,23 @@ public class ClientAbilityBarRenderHandler {
                     int slotY = y+3;
                     if(ability != null)
                     {
-                        renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY);
+
+                        if(ability instanceof ToggleAbility toggleAbility)
+                        {
+                            renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, toggleAbility.isEnabled());
+                        } else {
+                            renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, false);
+                        }
+
+
+                        // render selected name
+                        if(i == ClientAbilityBarHandler.getSelectedSlot())
+                        {
+                            graphics.drawCenteredString(minecraft.font,ability.getName(),screenWidth/2,y-10,0xFFFFFF);
+                        }
                     }
+
+
                 }
             }
 
@@ -58,8 +93,12 @@ public class ClientAbilityBarRenderHandler {
     }
 
 
-    private static void renderAbilityIcon(ResourceLocation icon, GuiGraphics graphics, int x, int y)
+    private static void renderAbilityIcon(ResourceLocation icon, GuiGraphics graphics, int x, int y, boolean enabled)
     {
         graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
+        if(enabled)
+        {
+            graphics.blit(SLOT_COVER, x,y,0,0,16,16,16,16);
+        }
     }
 }

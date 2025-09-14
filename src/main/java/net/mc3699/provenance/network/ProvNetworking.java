@@ -2,14 +2,16 @@ package net.mc3699.provenance.network;
 
 
 import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.AbilityExecutor;
-import net.mc3699.provenance.ability.ClientAbilityInfo;
+import net.mc3699.provenance.ability.utils.AbilityDataHandler;
+import net.mc3699.provenance.ability.utils.AbilityExecutor;
+import net.mc3699.provenance.ability.utils.ClientAbilityInfo;
+import net.mc3699.provenance.handlers.PlayerSyncHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = Provenance.MODID)
+@EventBusSubscriber(modid = Provenance.MODID)
 public class ProvNetworking {
 
     @SubscribeEvent
@@ -27,6 +29,12 @@ public class ProvNetworking {
                 AbilityDataSyncPayload.TYPE,
                 AbilityDataSyncPayload.CODEC,
                 ClientAbilityInfo::handle
+        );
+
+        registrar.playToServer(
+                RequestDataSyncPayload.TYPE,
+                RequestDataSyncPayload.CODEC,
+                PlayerSyncHandler::handleSyncRequests
         );
 
     }

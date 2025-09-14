@@ -1,5 +1,6 @@
-package net.mc3699.provenance.ability;
+package net.mc3699.provenance.ability.utils;
 
+import net.mc3699.provenance.ability.base.BaseAbility;
 import net.mc3699.provenance.util.ProvConstants;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

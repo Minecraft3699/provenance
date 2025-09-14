@@ -1,6 +1,7 @@
 package net.mc3699.provenance.handlers;
 
 import net.mc3699.provenance.Provenance;
+import net.mc3699.provenance.network.RequestDataSyncPayload;
 import net.mc3699.provenance.network.TriggerAbilityPayload;
 import net.mc3699.provenance.util.ProvKeymappings;
 import net.neoforged.api.distmarker.Dist;
@@ -21,6 +22,7 @@ public class ClientAbilityBarHandler {
     public static void triggerAbility(ClientTickEvent.Post event) {
         if(ProvKeymappings.ABILITY_KEY.isDown())
         {
+            PacketDistributor.sendToServer(new RequestDataSyncPayload());
             abilityBarActive = true;
         } else {
             if(abilityBarActive)
