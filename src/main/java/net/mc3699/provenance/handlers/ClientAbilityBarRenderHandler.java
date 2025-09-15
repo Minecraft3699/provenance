@@ -1,10 +1,9 @@
 package net.mc3699.provenance.handlers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.base.ToggleAbility;
-import net.mc3699.provenance.ability.utils.AbilityDataHandler;
-import net.mc3699.provenance.ability.base.BaseAbility;
+import net.mc3699.provenance.ability.foundation.ToggleAbility;
+import net.mc3699.provenance.ProvenanceDataHandler;
+import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.ability.utils.ClientAbilityInfo;
 import net.mc3699.provenance.util.ProvConstants;
 import net.minecraft.client.Minecraft;
@@ -37,23 +36,27 @@ public class ClientAbilityBarRenderHandler {
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
 
         // AP Bar
-        if(event.getName().equals(VanillaGuiLayers.HOTBAR))
+        if(event.getName().equals(VanillaGuiLayers.AIR_LEVEL))
         {
-            float apLevel = AbilityDataHandler.getAPFromTag(ClientAbilityInfo.clientData);
+            float apLevel = ProvenanceDataHandler.getAPFromTag(ClientAbilityInfo.clientData);
+            int apPercent = (int) ((apLevel / ProvenanceDataHandler.MAX_AP) * 81);
 
-            int apPercent = (int) ((apLevel / AbilityDataHandler.MAX_AP) * 81);
+            if(apPercent != 81)
+            {
+                int apX = (screenWidth / 2) + 9;
+                int apY = (screenHeight - 44);
+                graphics.blit(AP_BAR_EMPTY, apX, apY, 0,0, 81,4,81,4);
+                graphics.blit(AP_BAR_FULL, apX, apY, 0,0, apPercent,4,81,4);
+            }
 
-            int apX = (screenWidth / 2) - 180;
-            int apY = (screenHeight - 12);
-            graphics.blit(AP_BAR_EMPTY, apX, apY, 0,0, 81,4,81,4);
-            graphics.blit(AP_BAR_FULL, apX, apY, 0,0, apPercent,4,81,4);
+
         }
 
         // ability selector thing
         if(event.getName().equals(VanillaGuiLayers.HOTBAR) && ClientAbilityBarHandler.isAbilityBarActive())
         {
             int x = (screenWidth / 2) - 91;
-            int y = screenHeight - 70;
+            int y = screenHeight - 75;
             graphics.blit(ABILITY_BAR, x, y, 0, 0, 182, 22, 182, 22);
 
             // render icons
@@ -62,7 +65,7 @@ public class ClientAbilityBarRenderHandler {
             {
                 for(int i = 0; i < 8; i++)
                 {
-                    BaseAbility ability = AbilityDataHandler.getAbilityFromTag(ClientAbilityInfo.clientData, i);
+                    BaseAbility ability = ProvenanceDataHandler.getAbilityFromTag(ClientAbilityInfo.clientData, i);
                     int slotX = x+3 + i * 20;
                     int slotY = y+3;
                     if(ability != null)

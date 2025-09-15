@@ -2,7 +2,6 @@ package net.mc3699.provenance.network;
 
 
 import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.utils.AbilityDataHandler;
 import net.mc3699.provenance.ability.utils.AbilityExecutor;
 import net.mc3699.provenance.ability.utils.ClientAbilityInfo;
 import net.mc3699.provenance.handlers.PlayerSyncHandler;

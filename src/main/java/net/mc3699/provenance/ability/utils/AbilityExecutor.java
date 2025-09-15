@@ -1,8 +1,8 @@
 package net.mc3699.provenance.ability.utils;
 
-import net.mc3699.provenance.ability.base.BaseAbility;
+import net.mc3699.provenance.ProvenanceDataHandler;
+import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.network.TriggerAbilityPayload;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -12,8 +12,8 @@ public class AbilityExecutor {
     {
         ServerPlayer serverPlayer = (ServerPlayer) context.player();
         int slot = payload.abilitySlot();
-        BaseAbility ability = AbilityDataHandler.getAbility(serverPlayer, slot);
-        if(ability != null && ability.canExecute(serverPlayer) && ability.getUseCost() < AbilityDataHandler.getAP(serverPlayer))
+        BaseAbility ability = ProvenanceDataHandler.getAbility(serverPlayer, slot);
+        if(ability != null && ability.canExecute(serverPlayer) && ability.getUseCost() < ProvenanceDataHandler.getAP(serverPlayer))
         {
             ability.execute(serverPlayer);
         }

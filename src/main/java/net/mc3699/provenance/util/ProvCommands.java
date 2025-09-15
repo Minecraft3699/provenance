@@ -3,10 +3,13 @@ package net.mc3699.provenance.util;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.utils.AbilityDataHandler;
+import net.mc3699.provenance.ProvenanceDataHandler;
+import net.mc3699.provenance.archetype.foundation.BaseArchetype;
 import net.mc3699.provenance.registry.ProvAbilities;
+import net.mc3699.provenance.registry.ProvArchetypes;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
@@ -24,7 +27,7 @@ public class ProvCommands {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
         dispatcher.register(
-                Commands.literal("provenance")
+                Commands.literal("ability")
                         .requires(src -> src.hasPermission(2))
 
                         // Add ability
@@ -43,7 +46,7 @@ public class ProvCommands {
                                                                 return 0;
                                                             }
 
-                                                            AbilityDataHandler.setAbility(player, slot, id);
+                                                            ProvenanceDataHandler.setAbility(player, slot, id);
                                                             ctx.getSource().sendSuccess(
                                                                     () -> Component.literal("Set slot " + slot + " of " + player.getName().getString() + " to " + id),
                                                                     true
@@ -63,9 +66,48 @@ public class ProvCommands {
                                                     ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
                                                     int slot = IntegerArgumentType.getInteger(ctx, "slot");
 
-                                                    AbilityDataHandler.setAbility(player, slot, null);
+                                                    ProvenanceDataHandler.setAbility(player, slot, null);
                                                     ctx.getSource().sendSuccess(
                                                             () -> Component.literal("Cleared slot " + slot + " for " + player.getName().getString()),
+                                                            true
+                                                    );
+                                                    return 1;
+                                                })
+                                        )
+                                )
+                        )
+        );
+
+
+        // archetype
+
+        dispatcher.register(
+                Commands.literal("archetype")
+                        .requires(src -> src.hasPermission(2))
+                        .then(Commands.literal("set")
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.argument("archetype", ResourceLocationArgument.id())
+                                                .suggests((ctx, builder) ->
+                                                        SharedSuggestionProvider.suggestResource(
+                                                                ProvArchetypes.ARCHETYPES.getRegistry().get().keySet(), builder
+                                                        )
+                                                )
+                                                .executes(ctx -> {
+                                                    ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
+                                                    ResourceLocation id = ResourceLocationArgument.getId(ctx, "archetype");
+
+                                                    BaseArchetype archetype = ProvArchetypes.ARCHETYPES.getRegistry().get().get(id);
+                                                    if (archetype == null) {
+                                                        ctx.getSource().sendFailure(Component.literal("Unknown archetype: " + id));
+                                                        return 0;
+                                                    }
+
+                                                    ProvenanceDataHandler.applyArchetype(player, archetype);
+
+                                                    ctx.getSource().sendSuccess(
+                                                            () -> Component.literal("Assigned archetype " +
+                                                                    archetype.getName().getString() + " to " +
+                                                                    player.getName().getString()),
                                                             true
                                                     );
                                                     return 1;

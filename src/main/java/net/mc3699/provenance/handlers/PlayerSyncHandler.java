@@ -1,10 +1,9 @@
 package net.mc3699.provenance.handlers;
 
 import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.utils.AbilityDataHandler;
+import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.network.AbilityDataSyncPayload;
 import net.mc3699.provenance.network.RequestDataSyncPayload;
-import net.mc3699.provenance.network.TriggerAbilityPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -20,7 +19,7 @@ public class PlayerSyncHandler {
     {
         if(event.getEntity() instanceof ServerPlayer serverPlayer)
         {
-            PacketDistributor.sendToPlayer(serverPlayer, new AbilityDataSyncPayload(serverPlayer.getPersistentData().getCompound(AbilityDataHandler.ABILITY_TAG)));
+            PacketDistributor.sendToPlayer(serverPlayer, new AbilityDataSyncPayload(serverPlayer.getPersistentData().getCompound(ProvenanceDataHandler.ABILITY_TAG)));
         }
     }
 
@@ -28,7 +27,7 @@ public class PlayerSyncHandler {
     {
         if(context.player() instanceof ServerPlayer serverPlayer)
         {
-            PacketDistributor.sendToPlayer(serverPlayer, new AbilityDataSyncPayload(serverPlayer.getPersistentData().getCompound(AbilityDataHandler.ABILITY_TAG)));
+            PacketDistributor.sendToPlayer(serverPlayer, new AbilityDataSyncPayload(serverPlayer.getPersistentData().getCompound(ProvenanceDataHandler.ABILITY_TAG)));
         }
     }
 
