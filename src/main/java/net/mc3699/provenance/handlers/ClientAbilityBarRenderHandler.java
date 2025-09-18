@@ -15,7 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Provenance.MODID)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class ClientAbilityBarRenderHandler {
 
     private static final ResourceLocation ABILITY_BAR = ProvConstants.path("textures/gui/ability_bar.png");

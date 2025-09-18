@@ -14,7 +14,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = Provenance.MODID)
+@EventBusSubscriber
 public class MobHitAbilityHandler {
 
     @SubscribeEvent

@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@EventBusSubscriber(modid = Provenance.MODID)
+@EventBusSubscriber
 public class PlayerSyncHandler {
 
     @SubscribeEvent

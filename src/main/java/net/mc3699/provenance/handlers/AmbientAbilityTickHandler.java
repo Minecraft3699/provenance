@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = Provenance.MODID)
+@EventBusSubscriber
 public class AmbientAbilityTickHandler {
     
     @SubscribeEvent

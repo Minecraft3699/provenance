@@ -7,7 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
-@EventBusSubscriber(modid = Provenance.MODID)
+@EventBusSubscriber
 public class PlayerPersistenceHandler {
 
     @SubscribeEvent

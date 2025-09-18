@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Provenance.MODID)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class ClientAbilityBarHandler {
 
     private static boolean abilityBarActive;

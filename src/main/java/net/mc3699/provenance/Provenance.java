@@ -21,7 +21,6 @@ public class Provenance {
     {
         event.register(ProvenanceRegistries.ABILITY_REGISTRY);
         event.register(ProvenanceRegistries.ARCHETYPE_REGISTRY);
-        event.register(ProvenanceRegistries.WEAKNESS_REGISTRY);
     }
 
 }

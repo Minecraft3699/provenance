@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = Provenance.MODID)
+@EventBusSubscriber
 public class APTickHandler {
 
     @SubscribeEvent
