@@ -10,6 +10,7 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+    maven { url "https://cursemaven.com" }
 }
 
 base {
@@ -112,6 +113,7 @@ dependencies {
 
     // Example project dependency using a sister or child project:
     // implementation project(":myproject")
+    implementation ("curse.maven:customizable-player-models-439870:6787917")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

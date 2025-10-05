@@ -19,9 +19,12 @@ public abstract class BaseAbility {
 
     public abstract boolean canExecute(ServerPlayer player);
 
+    public String getAnimation() {
+        return null;
+    }
+
     public ResourceLocation getIcon()
     {
         return ProvConstants.path("textures/ability/missing.png");
     }
-
 }

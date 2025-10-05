@@ -21,24 +21,24 @@ public class CodRainAbility extends ToggleAbility {
     }
 
     @Override
-    public boolean canExecute(ServerPlayer player) {
-        return player.isInWater();
+    public boolean canExecute(ServerPlayer player){
+        return true;
     }
 
     @Override
     public void tick(ServerPlayer serverPlayer) {
         timer++;
-        if(timer % 10 == 0)
+        if(timer % 2 == 0)
         {
             ServerLevel serverLevel = serverPlayer.serverLevel();
-            for(int i = 0; i < 5; i++)
+            for(int i = 0; i < 50; i++)
             {
-                int codSpawnX = serverLevel.random.nextInt(-10,10);
-                int codSpawnZ = serverLevel.random.nextInt(-10,10);
+                int codSpawnX = serverLevel.random.nextInt(-60,60);
+                int codSpawnZ = serverLevel.random.nextInt(-60,60);
 
                 Cod newCod = new Cod(EntityType.COD, serverLevel);
                 Vec3 playerPos = serverPlayer.position();
-                newCod.setPos(playerPos.x+codSpawnX, playerPos.y+10,playerPos.z+codSpawnZ);
+                newCod.setPos(playerPos.x+codSpawnX, playerPos.y+40,playerPos.z+codSpawnZ);
                 serverLevel.addFreshEntity(newCod);
             }
         }
@@ -59,5 +59,10 @@ public class CodRainAbility extends ToggleAbility {
     @Override
     public Component getName() {
         return Component.literal("Cod Rain");
+    }
+
+    @Override
+    public String getAnimation() {
+        return "cod_rain";
     }
 }

@@ -2,8 +2,13 @@ package net.mc3699.provenance.ability.utils;
 
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
+import net.mc3699.provenance.cpm.ProvCPM;
 import net.mc3699.provenance.network.TriggerAbilityPayload;
+import net.mc3699.provenance.util.ProvScheduler;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.animal.Cod;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class AbilityExecutor {
@@ -16,6 +21,14 @@ public class AbilityExecutor {
         if(ability != null && ability.canExecute(serverPlayer) && ability.getUseCost() < ProvenanceDataHandler.getAP(serverPlayer))
         {
             ability.execute(serverPlayer);
+            if(ability.getAnimation() != null)
+            {
+                ProvScheduler.schedule(1, () ->
+                        ProvCPM.serverAPI.playAnimation(Player.class,  serverPlayer, "provenance-"+ability.getAnimation(), 0));
+                ProvScheduler.schedule(2, () ->
+                        ProvCPM.serverAPI.playAnimation(Player.class,  serverPlayer, "provenance-"+ability.getAnimation(), 1));
+
+            }
         }
     }
 

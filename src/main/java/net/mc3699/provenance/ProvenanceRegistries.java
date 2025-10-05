@@ -9,8 +9,8 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 
 public class ProvenanceRegistries {
 
-    public static final ResourceKey<Registry<BaseAbility>> ABILITY = ResourceKey.createRegistryKey(ProvConstants.path("ability"));
-    public static final ResourceKey<Registry<BaseArchetype>> ARCHETYPE = ResourceKey.createRegistryKey(ProvConstants.path("archetype"));
+    private static final ResourceKey<Registry<BaseAbility>> ABILITY = ResourceKey.createRegistryKey(ProvConstants.path("ability"));
+    private static final ResourceKey<Registry<BaseArchetype>> ARCHETYPE = ResourceKey.createRegistryKey(ProvConstants.path("archetype"));
     public static final Registry<BaseAbility> ABILITY_REGISTRY = new RegistryBuilder<>(ABILITY)
             .sync(true)
             .create();

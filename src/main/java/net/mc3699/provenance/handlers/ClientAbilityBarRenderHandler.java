@@ -34,11 +34,11 @@ public class ClientAbilityBarRenderHandler {
         GuiGraphics graphics = event.getGuiGraphics();
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
+        float apLevel = ProvenanceDataHandler.getAPFromTag(ClientAbilityInfo.clientData);
 
         // AP Bar
         if(event.getName().equals(VanillaGuiLayers.AIR_LEVEL))
         {
-            float apLevel = ProvenanceDataHandler.getAPFromTag(ClientAbilityInfo.clientData);
             int apPercent = (int) ((apLevel / ProvenanceDataHandler.MAX_AP) * 81);
 
             if(apPercent != 81)
@@ -74,9 +74,8 @@ public class ClientAbilityBarRenderHandler {
                         if(ability instanceof ToggleAbility toggleAbility)
                         {
                             renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, toggleAbility.isEnabled());
-                        } else {
-                            renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, false);
                         }
+
 
 
                         // render selected name
@@ -91,7 +90,7 @@ public class ClientAbilityBarRenderHandler {
             }
 
             int slotX = x + (ClientAbilityBarHandler.getSelectedSlot() * 20) -1;
-            graphics.blit(ABILITY_SELECTOR, slotX, y, 0, 0, 24, 23, 24, 23);
+            graphics.blit(ABILITY_SELECTOR, slotX, y-1, 0, 0, 24, 24, 24, 24);
         }
     }
 
