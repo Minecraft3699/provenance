@@ -26,6 +26,11 @@ public class TestAbility extends BaseAbility {
     }
 
     @Override
+    public int getCooldown() {
+        return 40;
+    }
+
+    @Override
     public String getAnimation() {
         return "test";
     }

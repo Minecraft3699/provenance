@@ -10,6 +10,8 @@ public abstract class BaseAbility {
 
     public abstract float getUseCost();
 
+    public int getCooldown() { return 1;};
+
     public abstract Component getName();
 
     public void execute(ServerPlayer player)

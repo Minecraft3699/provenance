@@ -4,6 +4,7 @@ import net.mc3699.provenance.ability.foundation.AmbientAbility;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.archetype.foundation.BaseArchetype;
 import net.mc3699.provenance.registry.ProvAbilities;
+import net.mc3699.provenance.registry.ProvArchetypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -17,6 +18,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ProvenanceDataHandler {
 
@@ -86,6 +88,30 @@ public class ProvenanceDataHandler {
             }
         }
         return slots;
+    }
+
+    public static void setCooldown(Player player, int slot, int cooldownTicks) {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        data.putInt("cooldown_slot_" + slot, cooldownTicks);
+        player.getPersistentData().put(ABILITY_TAG, data);
+    }
+
+    public static int getCooldown(Player player, int slot) {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        String key = "cooldown_slot_" + slot;
+        return data.contains(key) ? data.getInt(key) : 0;
+    }
+
+    public static boolean isOnCooldown(Player player, int slot) {
+        return getCooldown(player, slot) > 0;
+    }
+
+    public static void resetAllCooldowns(Player player) {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        for (int i = 0; i < 9; i++) {
+            data.remove("cooldown_slot_" + i);
+        }
+        player.getPersistentData().put(ABILITY_TAG, data);
     }
 
     public static BaseAbility getAbilityFromTag(CompoundTag data, int i) {
@@ -169,7 +195,7 @@ public class ProvenanceDataHandler {
         }
         data.put("ambient", ambientList);
         data.putFloat("action_points", MAX_AP);
-
+        data.putString("archetype", Objects.requireNonNull(ProvArchetypes.ARCHETYPES.getRegistry().get().getKey(archetype)).toString());
 
         player.getPersistentData().put(ABILITY_TAG, data);
     }

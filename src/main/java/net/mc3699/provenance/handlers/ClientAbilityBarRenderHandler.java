@@ -74,8 +74,17 @@ public class ClientAbilityBarRenderHandler {
                         if(ability instanceof ToggleAbility toggleAbility)
                         {
                             renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, toggleAbility.isEnabled());
+                        } else {
+                            renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, false);
                         }
 
+
+                        int cooldown = ClientAbilityInfo.clientData.getInt("cooldown_slot_"+i);
+
+                        if (cooldown > 0) {
+                            float progress = (float) cooldown / (float) ability.getCooldown();
+                            renderCooldownOverlay(graphics, slotX, slotY, progress);
+                        }
 
 
                         // render selected name
@@ -103,4 +112,15 @@ public class ClientAbilityBarRenderHandler {
             graphics.blit(SLOT_COVER, x,y,0,0,16,16,16,16);
         }
     }
+
+    private static void renderCooldownOverlay(GuiGraphics graphics, int x, int y, float progress) {
+        if (progress <= 0f) return;
+        if (progress > 1f) progress = 1f;
+
+        int height = Math.round(16 * progress);
+        int offsetY = 16 - height;
+        int color = 0x80FFFFFF;
+        graphics.fill(x, y + offsetY, x + 16, y + 16, color);
+    }
+
 }

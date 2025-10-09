@@ -9,6 +9,6 @@ public class ClientAbilityInfo {
 
     public static void handle(AbilityDataSyncPayload payload, IPayloadContext context)
     {
-        clientData = payload.abilities();
+        clientData = payload.abilities().copy();
     }
 }

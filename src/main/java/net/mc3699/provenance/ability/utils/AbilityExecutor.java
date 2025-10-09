@@ -1,5 +1,6 @@
 package net.mc3699.provenance.ability.utils;
 
+import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.cpm.ProvCPM;
@@ -18,9 +19,15 @@ public class AbilityExecutor {
         ServerPlayer serverPlayer = (ServerPlayer) context.player();
         int slot = payload.abilitySlot();
         BaseAbility ability = ProvenanceDataHandler.getAbility(serverPlayer, slot);
-        if(ability != null && ability.canExecute(serverPlayer) && ability.getUseCost() < ProvenanceDataHandler.getAP(serverPlayer))
+        if(ability != null
+                && ability.canExecute(serverPlayer)
+                && ability.getUseCost() < ProvenanceDataHandler.getAP(serverPlayer)
+                && !ProvenanceDataHandler.isOnCooldown(serverPlayer, slot))
         {
             ability.execute(serverPlayer);
+            ProvenanceDataHandler.setCooldown(serverPlayer, slot, ability.getCooldown());
+
+
             if(ability.getAnimation() != null)
             {
                 ProvScheduler.schedule(1, () ->
