@@ -11,9 +11,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 public class PlayerPersistenceHandler {
 
     @SubscribeEvent
-    public static void onPlayerClone(PlayerEvent.Clone event)
-    {
-        if(!event.isWasDeath()) return;
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!event.isWasDeath()) return;
         CompoundTag oldData = event.getOriginal().getPersistentData().getCompound(ProvenanceDataHandler.ABILITY_TAG);
         event.getEntity().getPersistentData().put(ProvenanceDataHandler.ABILITY_TAG, oldData.copy());
     }

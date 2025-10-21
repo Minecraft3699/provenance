@@ -34,7 +34,6 @@ public class AbilityExecutor {
                         ProvCPM.serverAPI.playAnimation(Player.class,  serverPlayer, "provenance-"+ability.getAnimation(), 0));
                 ProvScheduler.schedule(2, () ->
                         ProvCPM.serverAPI.playAnimation(Player.class,  serverPlayer, "provenance-"+ability.getAnimation(), 1));
-
             }
         }
     }

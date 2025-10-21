@@ -1,6 +1,11 @@
 {
-  "itemGroup.provenance": "Example Mod Tab",
-  "block.provenance.example_block": "Example Block",
-  "item.provenance.example_item": "Example Item",
-  "key.provenance.ability": "Ability"
+  "key.provenance.ability": "Open Ability Bar",
+  "key.provenance.ability_1": "Trigger Ability Slot 1",
+  "key.provenance.ability_2": "Trigger Ability Slot 2",
+  "key.provenance.ability_3": "Trigger Ability Slot 3",
+  "key.provenance.ability_4": "Trigger Ability Slot 4",
+  "key.provenance.ability_5": "Trigger Ability Slot 5",
+  "key.provenance.ability_6": "Trigger Ability Slot 6",
+  "key.provenance.ability_7": "Trigger Ability Slot 7",
+  "key.provenance.ability_8": "Trigger Ability Slot 8"
 }

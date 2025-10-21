@@ -21,6 +21,7 @@ public abstract class BaseAbility {
 
     public abstract boolean canExecute(ServerPlayer player);
 
+
     public String getAnimation() {
         return null;
     }

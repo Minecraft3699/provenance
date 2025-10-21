@@ -16,24 +16,21 @@ import java.util.List;
 public class AbilityTickHandler {
 
     @SubscribeEvent
-    public static void tickAbilities(ServerTickEvent.Pre event)
-    {
+    public static void tickAbilities(ServerTickEvent.Pre event) {
         List<ServerPlayer> players = event.getServer().getPlayerList().getPlayers();
 
         for (ServerPlayer player : players) {
             CompoundTag playerData = player.getPersistentData();
-            if(playerData.contains(ProvenanceDataHandler.ABILITY_TAG))
-            {
-                CompoundTag abilityData = playerData.getCompound(ProvenanceDataHandler.ABILITY_TAG);
-                for(int i = 0; i < 8; i++) {
+            if (playerData.contains(ProvenanceDataHandler.ABILITY_TAG)) {
+                CompoundTag abilityData = playerData.getCompound(ProvenanceDataHandler.ABILITY_TAG).copy();
+                for (int i = 0; i < 8; i++) {
                     BaseAbility ability = ProvenanceDataHandler.getAbilityFromTag(abilityData, i);
-                    if (ability instanceof ToggleAbility toggleAbility)
-                    {
-                        if(toggleAbility.isEnabled() && toggleAbility.canExecute(player))
-                        {
+
+                    if (ability instanceof ToggleAbility toggleAbility) {
+                        toggleAbility.backgroundTick(player);
+                        if (toggleAbility.isEnabled() && toggleAbility.canExecute(player)) {
                             toggleAbility.tick(player);
-                        } else if(!toggleAbility.canExecute(player))
-                        {
+                        } else if (!toggleAbility.canExecute(player)) {
                             toggleAbility.setEnabled(false);
                         }
                     }

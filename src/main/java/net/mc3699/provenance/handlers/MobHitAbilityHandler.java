@@ -18,16 +18,12 @@ import java.util.List;
 public class MobHitAbilityHandler {
 
     @SubscribeEvent
-    public static void onMobHit(LivingDamageEvent.Post event)
-    {
-        if(event.getSource().getDirectEntity() instanceof ServerPlayer player)
-        {
+    public static void onMobHit(LivingDamageEvent.Post event) {
+        if (event.getSource().getDirectEntity() instanceof ServerPlayer player) {
             List<BaseAbility> ambientAbilities = ProvenanceDataHandler.getAmbientAbilities(player);
             for (BaseAbility ability : ambientAbilities) {
-                if(ability instanceof AmbientMobHitAbility ambient)
-                {
-                    if(ambient.canExecute(player))
-                    {
+                if (ability instanceof AmbientMobHitAbility ambient) {
+                    if (ambient.canExecute(player)) {
                         ambient.onEntityHit(player, event.getEntity());
                     }
                 }

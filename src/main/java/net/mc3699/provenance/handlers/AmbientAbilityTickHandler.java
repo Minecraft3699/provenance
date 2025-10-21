@@ -14,19 +14,16 @@ import java.util.List;
 
 @EventBusSubscriber
 public class AmbientAbilityTickHandler {
-    
+
     @SubscribeEvent
-    public static void ambientTickEvent(ServerTickEvent.Post event)
-    {
+    public static void ambientTickEvent(ServerTickEvent.Post event) {
         List<ServerPlayer> players = event.getServer().getPlayerList().getPlayers();
 
         for (ServerPlayer player : players) {
             List<BaseAbility> ambientAbilities = ProvenanceDataHandler.getAmbientAbilities(player);
             for (BaseAbility ability : ambientAbilities) {
-                if(ability instanceof AmbientAbility ambient)
-                {
-                    if(ambient.canExecute(player))
-                    {
+                if (ability instanceof AmbientAbility ambient) {
+                    if (ambient.canExecute(player)) {
                         ambient.tick(player);
                     }
                 }

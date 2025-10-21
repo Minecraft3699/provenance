@@ -1,6 +1,7 @@
 package net.mc3699.provenance.ability.foundation;
 
 import net.mc3699.provenance.ProvenanceDataHandler;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public abstract class ToggleAbility extends BaseAbility {
@@ -12,6 +13,8 @@ public abstract class ToggleAbility extends BaseAbility {
         ProvenanceDataHandler.changeAP(serverPlayer, -getUseCost());
         if(ProvenanceDataHandler.getAP(serverPlayer) < getUseCost()) enabled = false;
     }
+
+    public abstract void backgroundTick(ServerPlayer serverPlayer);
 
     public boolean isEnabled() {
         return enabled;
@@ -26,4 +29,6 @@ public abstract class ToggleAbility extends BaseAbility {
     public void execute(ServerPlayer player) {
         enabled = !enabled;
     }
+
+
 }

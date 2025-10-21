@@ -15,14 +15,13 @@ import java.util.List;
 public class APTickHandler {
 
     @SubscribeEvent
-    public static void apTick(ServerTickEvent.Post event)
-    {
+    public static void apTick(ServerTickEvent.Post event) {
         List<ServerPlayer> players = event.getServer().getPlayerList().getPlayers();
 
         for (ServerPlayer player : players) {
             ProvenanceDataHandler.changeAP(player, 0.01f);
             PacketDistributor.sendToPlayer(player,
-                    new AbilityDataSyncPayload(player.getPersistentData().getCompound(ProvenanceDataHandler.ABILITY_TAG)));
+                    new AbilityDataSyncPayload(player.getPersistentData().getCompound(ProvenanceDataHandler.ABILITY_TAG).copy()));
         }
     }
 

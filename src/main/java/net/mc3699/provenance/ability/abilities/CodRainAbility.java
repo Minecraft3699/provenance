@@ -47,6 +47,11 @@ public class CodRainAbility extends ToggleAbility {
     }
 
     @Override
+    public void backgroundTick(ServerPlayer serverPlayer) {
+
+    }
+
+    @Override
     public float getUseCost() {
         return 0.05f;
     }
