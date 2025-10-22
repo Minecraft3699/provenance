@@ -30,7 +30,7 @@ neoForge {
         maybeCreate("client").apply {
             client()
             systemProperty("neoforge.enabledGameTestNamespaces", "mod_id"())
-            devLogin = true
+            devLogin = false
         }
 
         maybeCreate("server").apply {

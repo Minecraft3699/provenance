@@ -42,6 +42,9 @@ public class ProvenanceDataHandler {
     }
 
     public static float getAPFromTag(CompoundTag tag) {
+        if (tag == null || !tag.contains("action_points")) {
+            return 0.0f;
+        }
         return tag.getFloat("action_points");
     }
 
