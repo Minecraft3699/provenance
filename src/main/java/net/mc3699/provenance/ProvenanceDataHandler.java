@@ -9,12 +9,15 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ProvenanceDataHandler {
 
@@ -24,66 +27,43 @@ public class ProvenanceDataHandler {
     private static final Map<UUID, Map<Integer, BaseAbility>> playerAbilities = new HashMap<>();
 
     public static void changeAP(Player player, float amount) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         float existing = data.contains("action_points") ? data.getFloat("action_points") : MAX_AP;
         data.putFloat("action_points", Mth.clamp(existing + amount, 0, MAX_AP));
         player.getPersistentData().put(ABILITY_TAG, data);
     }
 
-    public static BaseAbility getAbilityFromClientTag(CompoundTag data, int slot) {
-        String key = "slot_" + slot;
-        if (!data.contains(key)) return null;
-        String raw = data.getString(key);
-        if (raw.isEmpty()) return null;
-
-        try {
-            ResourceLocation id = ResourceLocation.tryParse(raw);
-            if (id == null) return null;
-            BaseAbility template = ProvAbilities.ABILITIES.getRegistry().get().get(id);
-            if (template == null) return null;
-            return template.getClass().getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public static float getAPFromClientTag(CompoundTag data) {
-        if (data == null) return MAX_AP;
+    public static float getAP(Player player) {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         return data.contains("action_points") ? data.getFloat("action_points") : MAX_AP;
     }
 
-    public static float getAP(ServerPlayer serverPlayer) {
-        return serverPlayer.getPersistentData().getCompound(ABILITY_TAG).copy().getFloat("action_points");
-    }
-
     public static void setAbility(Player player, int slot, @Nullable ResourceLocation abilityId) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         String key = "slot_" + slot;
-        if (abilityId != null) {
-            data.putString(key, abilityId.toString());
-        } else {
-            data.remove(key);
-        }
+        if (abilityId != null) data.putString(key, abilityId.toString());
+        else data.remove(key);
         player.getPersistentData().put(ABILITY_TAG, data);
-        if (playerAbilities.containsKey(player.getUUID())) {
-            playerAbilities.get(player.getUUID()).remove(slot);
-        }
+        Map<Integer, BaseAbility> abilities = playerAbilities.get(player.getUUID());
+        if (abilities != null) abilities.remove(slot);
     }
 
-    public static @Nullable ResourceLocation getAbilityId(Player player, int slot) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+    @Nullable
+    public static ResourceLocation getAbilityId(Player player, int slot) {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         String key = "slot_" + slot;
         if (!data.contains(key)) return null;
         String raw = data.getString(key);
         if (raw.isEmpty()) return null;
         try {
-            return ResourceLocation.parse(raw);
+            return ResourceLocation.tryParse(raw);
         } catch (Exception e) {
             return null;
         }
     }
 
-    public static @Nullable BaseAbility getAbility(Player player, int slot) {
+    @Nullable
+    public static BaseAbility getAbility(Player player, int slot) {
         UUID playerId = player.getUUID();
         Map<Integer, BaseAbility> abilities = playerAbilities.computeIfAbsent(playerId, k -> new HashMap<>());
         if (abilities.containsKey(slot)) return abilities.get(slot);
@@ -101,22 +81,22 @@ public class ProvenanceDataHandler {
     }
 
     public static List<BaseAbility> getAbilities(Player player) {
-        List<BaseAbility> slots = new ArrayList<>();
+        List<BaseAbility> abilities = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             BaseAbility ability = getAbility(player, i);
-            if (ability != null) slots.add(ability);
+            if (ability != null) abilities.add(ability);
         }
-        return slots;
+        return abilities;
     }
 
     public static void setCooldown(Player player, int slot, int cooldownTicks) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         data.putInt("cooldown_slot_" + slot, cooldownTicks);
         player.getPersistentData().put(ABILITY_TAG, data);
     }
 
     public static int getCooldown(Player player, int slot) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         String key = "cooldown_slot_" + slot;
         return data.contains(key) ? data.getInt(key) : 0;
     }
@@ -126,72 +106,63 @@ public class ProvenanceDataHandler {
     }
 
     public static void resetAllCooldowns(Player player) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
-        for (int i = 0; i < 9; i++) {
-            data.remove("cooldown_slot_" + i);
-        }
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        for (int i = 0; i < 9; i++) data.remove("cooldown_slot_" + i);
         player.getPersistentData().put(ABILITY_TAG, data);
     }
 
     public static boolean isAbilityEnabled(Player player, int slot) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         return data.getBoolean("slot_enabled_" + slot);
     }
 
     public static void setAbilityEnabled(Player player, int slot, boolean enabled) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         data.putBoolean("slot_enabled_" + slot, enabled);
         player.getPersistentData().put(ABILITY_TAG, data);
     }
 
-    public static void removePlayerAbilities(Player player) {
-        playerAbilities.remove(player.getUUID());
-    }
-
-    public static void addAmbientAbility(Player player, ResourceLocation abilityId) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
-        ListTag ambientList = data.getList("ambient", Tag.TAG_STRING);
-        String idString = abilityId.toString();
-        for (Tag t : ambientList) {
-            if (t != null && t.getAsString().equals(idString)) return;
-        }
-        ambientList.add(StringTag.valueOf(idString));
-        data.put("ambient", ambientList);
-        player.getPersistentData().put(ABILITY_TAG, data);
-    }
-
-    public static void removeAmbientAbility(Player player, ResourceLocation abilityId) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
-        ListTag ambientList = data.getList("ambient", Tag.TAG_STRING);
-        ListTag newList = new ListTag();
-        String idString = abilityId.toString();
-        for (Tag t : ambientList) {
-            if (t != null && !t.getAsString().equals(idString)) newList.add(t);
-        }
-        data.put("ambient", newList);
-        player.getPersistentData().put(ABILITY_TAG, data);
-    }
+    private static final Map<UUID, Map<ResourceLocation, BaseAbility>> playerAmbientAbilities = new HashMap<>();
 
     public static List<BaseAbility> getAmbientAbilities(Player player) {
-        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG).copy();
+        UUID playerId = player.getUUID();
+        Map<ResourceLocation, BaseAbility> ambientMap = playerAmbientAbilities.computeIfAbsent(playerId, k -> new HashMap<>());
+
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         ListTag ambientList = data.getList("ambient", Tag.TAG_STRING);
         List<BaseAbility> abilities = new ArrayList<>();
+
         for (Tag t : ambientList) {
             if (t == null) continue;
             String raw = t.getAsString();
             if (raw.isEmpty()) continue;
             try {
-                ResourceLocation id = ResourceLocation.parse(raw);
-                BaseAbility ability = ProvAbilities.ABILITIES.getRegistry().get().get(id);
-                if (ability != null) abilities.add(ability);
-            } catch (Exception ignored) {
-            }
+                ResourceLocation id = ResourceLocation.tryParse(raw);
+                if (id == null) continue;
+                if (ambientMap.containsKey(id)) {
+                    abilities.add(ambientMap.get(id));
+                } else {
+                    BaseAbility templateAbility = ProvAbilities.ABILITIES.getRegistry().get().get(id);
+                    if (templateAbility != null) {
+                        BaseAbility instance = templateAbility.getClass().getDeclaredConstructor().newInstance();
+                        ambientMap.put(id, instance);
+                        abilities.add(instance);
+                    }
+                }
+            } catch (Exception ignored) {}
         }
         return abilities;
     }
 
+    public static void removePlayerAbilities(Player player) {
+        UUID id = player.getUUID();
+        playerAbilities.remove(id);
+        playerAmbientAbilities.remove(id);
+    }
+
     public static void applyArchetype(Player player, BaseArchetype archetype) {
         CompoundTag data = new CompoundTag();
+        data.putFloat("action_points", MAX_AP);
         Map<Integer, BaseAbility> slots = archetype.getPlayerAbilities();
         if (slots != null) {
             for (var entry : slots.entrySet()) {
@@ -218,7 +189,11 @@ public class ProvenanceDataHandler {
             }
         }
         data.put("ambient", ambientList);
-        data.putFloat("action_points", MAX_AP);
+        for (int i = 0; i < 9; i++) {
+            data.remove("slot_enabled_" + i);
+            data.remove("cooldown_slot_" + i);
+        }
         player.getPersistentData().put(ABILITY_TAG, data);
+        playerAbilities.remove(player.getUUID());
     }
 }

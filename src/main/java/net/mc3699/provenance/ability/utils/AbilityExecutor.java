@@ -29,13 +29,14 @@ public class AbilityExecutor {
             if (ability.getUseCost() <= ProvenanceDataHandler.getAP(player) && !ProvenanceDataHandler.isOnCooldown(player, slot)) {
 
                 ability.execute(player);
+                if (ability.getAnimation() != null) {
+                    ProvScheduler.schedule(1, () -> ProvCPM.serverAPI.playAnimation(Player.class, player, "provenance-" + ability.getAnimation(), 0));
+                    ProvScheduler.schedule(2, () -> ProvCPM.serverAPI.playAnimation(Player.class, player, "provenance-" + ability.getAnimation(), 1));
+                }
                 ProvenanceDataHandler.setCooldown(player, slot, ability.getCooldown());
             }
         }
 
-        if (ability.getAnimation() != null) {
-            ProvScheduler.schedule(1, () -> ProvCPM.serverAPI.playAnimation(Player.class, player, "provenance-" + ability.getAnimation(), 0));
-            ProvScheduler.schedule(2, () -> ProvCPM.serverAPI.playAnimation(Player.class, player, "provenance-" + ability.getAnimation(), 1));
-        }
+
     }
 }
