@@ -1,9 +1,8 @@
 package net.mc3699.provenance.handlers;
 
-import net.mc3699.provenance.Provenance;
-import net.mc3699.provenance.ability.foundation.ToggleAbility;
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
+import net.mc3699.provenance.ability.foundation.ToggleAbility;
 import net.mc3699.provenance.ability.utils.ClientAbilityInfo;
 import net.mc3699.provenance.util.ProvConstants;
 import net.minecraft.client.Minecraft;
@@ -20,86 +19,75 @@ public class ClientAbilityBarRenderHandler {
 
     private static final ResourceLocation ABILITY_BAR = ProvConstants.path("textures/gui/ability_bar.png");
     private static final ResourceLocation ABILITY_SELECTOR = ProvConstants.path("textures/gui/ability_selection.png");
-    private static final ResourceLocation SLOT_COVER = ProvConstants.path("textures/gui/slot_enabled.png");
-    // 81x4
     private static final ResourceLocation AP_BAR_EMPTY = ProvConstants.path("textures/gui/ap_bar_empty.png");
     private static final ResourceLocation AP_BAR_FULL = ProvConstants.path("textures/gui/ap_bar_full.png");
 
-
     @SubscribeEvent
     public static void onRenderGUI(RenderGuiLayerEvent.Post event) {
-
-        Minecraft minecraft = Minecraft.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         GuiGraphics graphics = event.getGuiGraphics();
-        int screenWidth = minecraft.getWindow().getGuiScaledWidth();
-        int screenHeight = minecraft.getWindow().getGuiScaledHeight();
-        float apLevel = ProvenanceDataHandler.getAPFromTag(ClientAbilityInfo.clientData);
+        int screenWidth = mc.getWindow().getGuiScaledWidth();
+        int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        // AP Bar
         if (event.getName().equals(VanillaGuiLayers.AIR_LEVEL)) {
-            int apPercent = (int) ((apLevel / ProvenanceDataHandler.MAX_AP) * 81);
+            float ap = ProvenanceDataHandler.getAPFromClientTag(ClientAbilityInfo.clientData);
 
-            if (apPercent != 81) {
+            if (ap < ProvenanceDataHandler.MAX_AP) {
+                int apWidth = (int) ((ap / ProvenanceDataHandler.MAX_AP) * 81);
                 int apX = (screenWidth / 2) + 9;
-                int apY = (screenHeight - 44);
+                int apY = screenHeight - 44;
+
                 graphics.blit(AP_BAR_EMPTY, apX, apY, 0, 0, 81, 4, 81, 4);
-                graphics.blit(AP_BAR_FULL, apX, apY, 0, 0, apPercent, 4, 81, 4);
+                if (apWidth > 0) {
+                    graphics.blit(AP_BAR_FULL, apX, apY, 0, 0, apWidth, 4, 81, 4);
+                }
             }
-
-
         }
 
-        // ability selector thing
         if (event.getName().equals(VanillaGuiLayers.HOTBAR) && ClientAbilityBarHandler.isAbilityBarActive()) {
             int x = (screenWidth / 2) - 91;
             int y = screenHeight - 75;
+
+            graphics.setColor(1f, 1f, 1f, 0.85f);
             graphics.blit(ABILITY_BAR, x, y, 0, 0, 182, 22, 182, 22);
+            graphics.setColor(1f, 1f, 1f, 1f);
 
-            // render icons
+            for (int i = 0; i < 8; i++) {
+                BaseAbility ability = ProvenanceDataHandler.getAbilityFromClientTag(ClientAbilityInfo.clientData, i);
+                if (ability == null) continue;
 
-            if (minecraft.player != null) {
-                for (int i = 0; i < 8; i++) {
-                    BaseAbility ability = ProvenanceDataHandler.getAbilityFromTag(ClientAbilityInfo.clientData, i);
-                    int slotX = x + 3 + i * 20;
-                    int slotY = y + 3;
-                    if (ability != null) {
+                int slotX = x + 3 + i * 20;
+                int slotY = y + 3;
 
-                        if (ability instanceof ToggleAbility toggleAbility) {
-                            renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, toggleAbility.isEnabled());
-                        } else {
-                            renderAbilityIcon(ability.getIcon(), graphics, slotX, slotY, false);
-                        }
+                boolean enabled = false;
+                if (ability instanceof ToggleAbility) {
+                    enabled = ClientAbilityInfo.clientData.getBoolean("slot_enabled_" + i);
+                }
 
+                renderAbilityIcon(graphics, ability.getIcon(), slotX, slotY, enabled);
 
-                        int cooldown = ClientAbilityInfo.clientData.getInt("cooldown_slot_" + i);
+                int cooldown = ClientAbilityInfo.clientData.getInt("cooldown_slot_" + i);
+                if (cooldown > 0) {
+                    float progress = Math.min(1f, (float) cooldown / Math.max(1f, ability.getCooldown()));
+                    renderCooldownOverlay(graphics, slotX, slotY, progress);
+                }
 
-                        if (cooldown > 0) {
-                            float progress = (float) cooldown / (float) ability.getCooldown();
-                            renderCooldownOverlay(graphics, slotX, slotY, progress);
-                        }
-
-
-                        // render selected name
-                        if (i == ClientAbilityBarHandler.getSelectedSlot()) {
-                            graphics.drawCenteredString(minecraft.font, ability.getName(), screenWidth / 2, y - 10, 0xFFFFFF);
-                        }
-                    }
-
-
+                if (i == ClientAbilityBarHandler.getSelectedSlot()) {
+                    graphics.drawCenteredString(mc.font, ability.getName(), screenWidth / 2, y - 10, 0xFFFFFF);
                 }
             }
 
-            int slotX = x + (ClientAbilityBarHandler.getSelectedSlot() * 20) - 1;
-            graphics.blit(ABILITY_SELECTOR, slotX, y - 1, 0, 0, 24, 24, 24, 24);
+            int selectedX = x + (ClientAbilityBarHandler.getSelectedSlot() * 20) - 1;
+            graphics.blit(ABILITY_SELECTOR, selectedX, y - 1, 0, 0, 24, 24, 24, 24);
         }
     }
 
-
-    private static void renderAbilityIcon(ResourceLocation icon, GuiGraphics graphics, int x, int y, boolean enabled) {
-        graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
-        if (enabled) {
-            graphics.blit(SLOT_COVER, x, y, 0, 0, 16, 16, 16, 16);
+    private static void renderAbilityIcon(GuiGraphics graphics, ResourceLocation icon, int x, int y, boolean enabled) {
+        if (!enabled) {
+            graphics.setColor(0.5f, 0.5f, 0.5f, 1f);
         }
+        graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
+        graphics.setColor(1f, 1f, 1f, 1f);
     }
 
     private static void renderCooldownOverlay(GuiGraphics graphics, int x, int y, float progress) {
@@ -111,5 +99,4 @@ public class ClientAbilityBarRenderHandler {
         int color = 0x80FFFFFF;
         graphics.fill(x, y + offsetY, x + 16, y + 16, color);
     }
-
 }

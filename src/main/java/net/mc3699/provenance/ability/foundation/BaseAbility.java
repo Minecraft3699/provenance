@@ -30,4 +30,13 @@ public abstract class BaseAbility {
     {
         return ProvConstants.path("textures/ability/missing.png");
     }
+
+    public BaseAbility createNew() {
+        try {
+            return this.getClass().getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

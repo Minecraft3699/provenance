@@ -5,10 +5,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientAbilityInfo {
-    public static CompoundTag clientData;
 
-    public static void handle(AbilityDataSyncPayload payload, IPayloadContext context)
-    {
-        clientData = payload.abilities().copy();
+    public static CompoundTag clientData = new CompoundTag();
+
+    public static void handle(AbilityDataSyncPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            CompoundTag incoming = payload.abilities();
+            if (incoming != null) {
+                clientData = incoming.copy();
+            }
+        });
     }
 }

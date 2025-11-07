@@ -14,65 +14,53 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(value = Dist.CLIENT)
 public class ClientAbilityBarHandler {
 
-    private static boolean abilityBarActive;
+    private static final boolean[] prevAbilityKeys = new boolean[9];
+    private static boolean abilityBarActive = false;
     private static int selectedSlot = 0;
+    private static boolean prevBarKey = false;
 
     @SubscribeEvent
     public static void triggerAbility(ClientTickEvent.Post event) {
-        if (ProvKeymappings.ABILITY_BAR_KEY.isDown()) {
+        boolean barKeyDown = ProvKeymappings.ABILITY_BAR_KEY.isDown();
+
+        if (barKeyDown && !prevBarKey) {
             PacketDistributor.sendToServer(new RequestDataSyncPayload());
             abilityBarActive = true;
-        } else {
-            if (abilityBarActive) {
-                if (selectedSlot != 0) {
-                    PacketDistributor.sendToServer(new TriggerAbilityPayload(selectedSlot, true));
-                }
-                selectedSlot = 0;
+        } else if (!barKeyDown && prevBarKey) {
+            if (selectedSlot != 0) {
+                PacketDistributor.sendToServer(new TriggerAbilityPayload(selectedSlot, true));
             }
+            selectedSlot = 0;
             abilityBarActive = false;
         }
+        prevBarKey = barKeyDown;
 
-        if (ProvKeymappings.ABILITY_1_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(1, true));
-        }
+        checkAbilityKey(1, ProvKeymappings.ABILITY_1_KEY.isDown());
+        checkAbilityKey(2, ProvKeymappings.ABILITY_2_KEY.isDown());
+        checkAbilityKey(3, ProvKeymappings.ABILITY_3_KEY.isDown());
+        checkAbilityKey(4, ProvKeymappings.ABILITY_4_KEY.isDown());
+        checkAbilityKey(5, ProvKeymappings.ABILITY_5_KEY.isDown());
+        checkAbilityKey(6, ProvKeymappings.ABILITY_6_KEY.isDown());
+        checkAbilityKey(7, ProvKeymappings.ABILITY_7_KEY.isDown());
+        checkAbilityKey(8, ProvKeymappings.ABILITY_8_KEY.isDown());
+    }
 
-        if (ProvKeymappings.ABILITY_2_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(2, true));
+    private static void checkAbilityKey(int index, boolean isDown) {
+        if (isDown && !prevAbilityKeys[index]) {
+            PacketDistributor.sendToServer(new TriggerAbilityPayload(index, true));
         }
-
-        if (ProvKeymappings.ABILITY_3_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(3, true));
-        }
-
-        if (ProvKeymappings.ABILITY_4_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(4, true));
-        }
-
-        if (ProvKeymappings.ABILITY_5_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(5, true));
-        }
-
-        if (ProvKeymappings.ABILITY_6_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(6, true));
-        }
-
-        if (ProvKeymappings.ABILITY_7_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(7, true));
-        }
-
-        if (ProvKeymappings.ABILITY_8_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(8, true));
-        }
+        prevAbilityKeys[index] = isDown;
     }
 
     @SubscribeEvent
     public static void onScroll(InputEvent.MouseScrollingEvent event) {
-        if (abilityBarActive) {
-            double scroll = event.getScrollDeltaY();
-            if (scroll > 0) selectedSlot = (selectedSlot + 8) % 9;
-            else if (scroll < 0) selectedSlot = (selectedSlot + 1) % 9;
-            event.setCanceled(true);
-        }
+        if (!abilityBarActive) return;
+
+        double scroll = event.getScrollDeltaY();
+        if (scroll > 0) selectedSlot = (selectedSlot + 8) % 9; // scroll up
+        else if (scroll < 0) selectedSlot = (selectedSlot + 1) % 9; // scroll down
+
+        event.setCanceled(true);
     }
 
     public static boolean isAbilityBarActive() {
@@ -95,5 +83,4 @@ public class ClientAbilityBarHandler {
         event.register(ProvKeymappings.ABILITY_7_KEY);
         event.register(ProvKeymappings.ABILITY_8_KEY);
     }
-
 }
