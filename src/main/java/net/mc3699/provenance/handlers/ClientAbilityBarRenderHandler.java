@@ -23,7 +23,6 @@ public class ClientAbilityBarRenderHandler {
     private static final ResourceLocation ABILITY_SELECTOR = ProvConstants.path("textures/gui/ability_selection.png");
     private static final ResourceLocation AP_BAR_EMPTY = ProvConstants.path("textures/gui/ap_bar_empty.png");
     private static final ResourceLocation AP_BAR_FULL = ProvConstants.path("textures/gui/ap_bar_full.png");
-    private static final ResourceLocation SLOT_COVER = ProvConstants.path("textures/gui/slot_enabled.png");
 
     @SubscribeEvent
     public static void onRenderGUI(RenderGuiLayerEvent.Post event) {
@@ -63,7 +62,10 @@ public class ClientAbilityBarRenderHandler {
 
                 int slotX = x + 3 + i * 20;
                 int slotY = y + 3;
-                boolean enabled = data.getBoolean("slot_enabled_" + i);
+
+                boolean enabled = true;
+                if (ability instanceof ToggleAbility) enabled = data.getBoolean("slot_enabled_" + i);
+
                 renderAbilityIcon(graphics, ability.getIcon(), slotX, slotY, enabled);
 
                 int cooldown = data.contains("cooldown_slot_" + i) ? data.getInt("cooldown_slot_" + i) : 0;
@@ -87,8 +89,6 @@ public class ClientAbilityBarRenderHandler {
             graphics.setColor(0.5f, 0.5f, 0.5f, 1f);
             graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
             graphics.setColor(1f, 1f, 1f, 1f);
-        } else {
-            graphics.blit(SLOT_COVER, x, y, 0, 0, 16, 16, 16, 16);
         }
     }
 
