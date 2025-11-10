@@ -14,54 +14,35 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(value = Dist.CLIENT)
 public class ClientAbilityBarHandler {
 
+    private static final boolean[] prevAbilityKeys = new boolean[8];
     private static boolean abilityBarActive;
     private static int selectedSlot = 0;
+    private static boolean prevBarKey = false;
 
     @SubscribeEvent
     public static void triggerAbility(ClientTickEvent.Post event) {
-        if (ProvKeymappings.ABILITY_BAR_KEY.isDown()) {
+        boolean barKeyDown = ProvKeymappings.ABILITY_BAR_KEY.isDown();
+
+        if (barKeyDown && !prevBarKey) {
             PacketDistributor.sendToServer(new RequestDataSyncPayload());
             abilityBarActive = true;
-        } else {
-            if (abilityBarActive) {
-                if (selectedSlot != 0) {
-                    PacketDistributor.sendToServer(new TriggerAbilityPayload(selectedSlot, true));
-                }
-                selectedSlot = 0;
+        } else if (!barKeyDown && prevBarKey) {
+            if (selectedSlot != 0) {
+                PacketDistributor.sendToServer(new TriggerAbilityPayload(selectedSlot, true));
             }
+            selectedSlot = 0;
             abilityBarActive = false;
         }
 
-        if (ProvKeymappings.ABILITY_1_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(1, true));
-        }
+        prevBarKey = barKeyDown;
 
-        if (ProvKeymappings.ABILITY_2_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(2, true));
-        }
+        boolean[] current = {ProvKeymappings.ABILITY_1_KEY.isDown(), ProvKeymappings.ABILITY_2_KEY.isDown(), ProvKeymappings.ABILITY_3_KEY.isDown(), ProvKeymappings.ABILITY_4_KEY.isDown(), ProvKeymappings.ABILITY_5_KEY.isDown(), ProvKeymappings.ABILITY_6_KEY.isDown(), ProvKeymappings.ABILITY_7_KEY.isDown(), ProvKeymappings.ABILITY_8_KEY.isDown()};
 
-        if (ProvKeymappings.ABILITY_3_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(3, true));
-        }
-
-        if (ProvKeymappings.ABILITY_4_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(4, true));
-        }
-
-        if (ProvKeymappings.ABILITY_5_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(5, true));
-        }
-
-        if (ProvKeymappings.ABILITY_6_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(6, true));
-        }
-
-        if (ProvKeymappings.ABILITY_7_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(7, true));
-        }
-
-        if (ProvKeymappings.ABILITY_8_KEY.isDown()) {
-            PacketDistributor.sendToServer(new TriggerAbilityPayload(8, true));
+        for (int i = 0; i < 8; i++) {
+            if (current[i] && !prevAbilityKeys[i]) {
+                PacketDistributor.sendToServer(new TriggerAbilityPayload(i + 1, true));
+            }
+            prevAbilityKeys[i] = current[i];
         }
     }
 
