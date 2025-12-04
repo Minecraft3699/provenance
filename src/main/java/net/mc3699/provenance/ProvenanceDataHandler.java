@@ -160,6 +160,17 @@ public class ProvenanceDataHandler {
         playerAmbientAbilities.remove(id);
     }
 
+    public static boolean disableAbilityInstance(Player player, BaseAbility instance) {
+        for (int slot = 0; slot < 9; slot++) {
+            BaseAbility a = getAbility(player, slot);
+            if (a == instance) {
+                setAbilityEnabled(player, slot, false);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void applyArchetype(Player player, BaseArchetype archetype) {
         CompoundTag data = new CompoundTag();
         data.putFloat("action_points", MAX_AP);

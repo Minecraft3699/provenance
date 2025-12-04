@@ -43,6 +43,8 @@ public class AbilityTickHandler {
 
             boolean enabled = toggle.isEnabled(player, slot);
 
+            toggle.backgroundTick(player);
+
             if (enabled) {
                 if (toggle.canExecute(player) && toggle.getUseCost() <= ProvenanceDataHandler.getAP(player)) {
                     toggle.tick(player);

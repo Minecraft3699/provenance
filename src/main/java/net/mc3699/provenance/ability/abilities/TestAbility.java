@@ -16,7 +16,7 @@ public class TestAbility extends BaseAbility {
 
     @Override
     public boolean canExecute(ServerPlayer player) {
-        return true;
+        return player.isInWater();
     }
 
     @Override
