@@ -21,6 +21,8 @@ public abstract class BaseAbility {
 
     public abstract boolean canExecute(ServerPlayer player);
 
+    public void backgroundTick(ServerPlayer serverPlayer) {
+    }
 
     public String getAnimation() {
         return null;

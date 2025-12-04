@@ -21,6 +21,17 @@ public class AbilityTickHandler {
             tickAmbientAbilities(player);
             tickToggleAbilities(player);
             decrementCooldowns(player);
+            tickBackground(player);
+        }
+    }
+
+    private static void tickBackground(ServerPlayer player)
+    {
+        for (int slot = 0; slot < 9; slot++) {
+            BaseAbility ability = ProvenanceDataHandler.getAbility(player, slot);
+            if (ability != null) {
+                ability.backgroundTick(player);
+            }
         }
     }
 
@@ -42,8 +53,6 @@ public class AbilityTickHandler {
             if (!(ability instanceof ToggleAbility toggle)) continue;
 
             boolean enabled = toggle.isEnabled(player, slot);
-
-            toggle.backgroundTick(player);
 
             if (enabled) {
                 if (toggle.canExecute(player) && toggle.getUseCost() <= ProvenanceDataHandler.getAP(player)) {

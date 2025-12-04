@@ -12,9 +12,6 @@ public abstract class ToggleAbility extends BaseAbility {
         if (ProvenanceDataHandler.getAP(serverPlayer) < getUseCost()) enabled = false;
     }
 
-    public void backgroundTick(ServerPlayer serverPlayer) {
-    }
-
     public boolean isEnabled(ServerPlayer player, int slot) {
         return ProvenanceDataHandler.isAbilityEnabled(player, slot);
     }
