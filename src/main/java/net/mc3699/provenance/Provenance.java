@@ -1,7 +1,10 @@
 package net.mc3699.provenance;
 
+import net.mc3699.provenance.item.ProvItems;
 import net.mc3699.provenance.registry.ProvAbilities;
 import net.mc3699.provenance.registry.ProvArchetypes;
+import net.mc3699.provenance.registry.ProvComponents;
+import net.mc3699.provenance.registry.ProvCreativeTabs;
 import net.mc3699.provenance.util.ProvScheduler;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.InterModComms;
@@ -19,6 +22,10 @@ public class Provenance {
         ProvAbilities.register(modEventBus);
         ProvArchetypes.register(modEventBus);
         modEventBus.addListener(this::registerRegistries);
+
+        ProvComponents.register(modEventBus);
+        ProvItems.register(modEventBus);
+        ProvCreativeTabs.register(modEventBus);
     }
 
     private void registerRegistries(NewRegistryEvent event)

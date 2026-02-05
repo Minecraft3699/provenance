@@ -1,10 +1,15 @@
 package net.mc3699.provenance.abilityMenu;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.ability.foundation.ToggleAbility;
 import net.mc3699.provenance.ability.utils.ClientAbilityInfo;
+import net.mc3699.provenance.abilityMenu.keybind.AbilityKeybind;
+import net.mc3699.provenance.abilityMenu.keybind.AbilityKeybindHandler;
 import net.mc3699.provenance.abilityMenu.renderUtil.RadialMenuState;
+import net.mc3699.provenance.network.TriggerAbilityPayload;
 import net.mc3699.provenance.registry.ProvAbilities;
 import net.mc3699.provenance.util.ProvConstants;
 import net.minecraft.client.Minecraft;
@@ -16,8 +21,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +34,50 @@ public class ClientAbilityBarRenderHandler {
 
     private static final ResourceLocation AP_BAR_EMPTY = ProvConstants.path("textures/gui/ap_bar_empty.png");
     private static final ResourceLocation AP_BAR_FULL = ProvConstants.path("textures/gui/ap_bar_full.png");
+    private static final ResourceLocation ABILITY_SLOT = ProvConstants.path("textures/gui/ability_radial_slot.png");
 
     public record AbilityEntry(ResourceLocation id, boolean enabled, BaseAbility ability) {}
+
+
+
+    @SubscribeEvent
+    public static void onKeyInput(InputEvent.Key event) {
+        if (!(event.getAction() == InputConstants.PRESS)) return;
+
+        int key = event.getKey();
+        int mods = event.getModifiers();
+
+        for (ResourceLocation abilityId : AbilityKeybindHandler.getAllBoundAbilities()) {
+            if (AbilityKeybindHandler.matches(abilityId, key, mods)) {
+                PacketDistributor.sendToServer(
+                        new TriggerAbilityPayload(abilityId)
+                );
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMouseInput(InputEvent.MouseButton.Pre event) {
+        if (event.getAction() != InputConstants.PRESS) return;
+        if (!ClientAbilityBarHandler.isActive()) return;
+
+        int hovered = RadialMenuState.hoveredIndex;
+        if (hovered < 0 || hovered >= RadialMenuState.entries.size()) return;
+
+        AbilityEntry entry = RadialMenuState.entries.get(hovered);
+
+        PacketDistributor.sendToServer(
+                new TriggerAbilityPayload(entry.id())
+        );
+
+        if(event.getButton() == InputConstants.MOUSE_BUTTON_MIDDLE) {
+            AbilityKeybindHandler.setBinding(entry.id(), new AbilityKeybind(InputConstants.KEY_G, 0));
+        }
+
+        event.setCanceled(true);
+    }
+
+
 
     @SubscribeEvent
     public static void onRenderGUI(RenderGuiLayerEvent.Post event) {

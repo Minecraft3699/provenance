@@ -52,7 +52,7 @@ public class ClientAbilityBarHandler {
 
                 ResourceLocation id =
                         RadialMenuState.entries.get(RadialMenuState.hoveredIndex).id();
-                PacketDistributor.sendToServer(new TriggerAbilityPayload(id, true));
+                PacketDistributor.sendToServer(new TriggerAbilityPayload(id));
             }
             abilityBarActive = false;
             RadialMenuState.entries = null;
@@ -77,7 +77,7 @@ public class ClientAbilityBarHandler {
             for (int i = 0; i < Math.min(8, RadialMenuState.entries.size()); i++) {
                 if (current[i] && !prevAbilityKeys[i]) {
                     ResourceLocation id = RadialMenuState.entries.get(i).id();
-                    PacketDistributor.sendToServer(new TriggerAbilityPayload(id, true));
+                    PacketDistributor.sendToServer(new TriggerAbilityPayload(id));
                 }
                 prevAbilityKeys[i] = current[i];
             }

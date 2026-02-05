@@ -7,7 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record TriggerAbilityPayload(ResourceLocation abilityId, boolean state) implements CustomPacketPayload {
+public record TriggerAbilityPayload(ResourceLocation abilityId) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<TriggerAbilityPayload> TYPE =
             new CustomPacketPayload.Type<>(ProvConstants.path("trigger_ability"));
@@ -15,8 +15,6 @@ public record TriggerAbilityPayload(ResourceLocation abilityId, boolean state) i
     public static final StreamCodec<ByteBuf, TriggerAbilityPayload> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC,
             TriggerAbilityPayload::abilityId,
-            ByteBufCodecs.BOOL,
-            TriggerAbilityPayload::state,
             TriggerAbilityPayload::new
     );
 
