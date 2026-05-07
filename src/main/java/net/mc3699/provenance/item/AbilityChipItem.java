@@ -1,13 +1,17 @@
 package net.mc3699.provenance.item;
 
+import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.ProvenanceRegistries;
+import net.mc3699.provenance.ability.foundation.AmbientAbility;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.registry.ProvComponents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +42,8 @@ public class AbilityChipItem extends Item {
 
             assert abilityID != null;
             ProvenanceDataHandler.addAbility(player, abilityID);
+
+            serverLevel.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS);
             stack.shrink(1);
         }
 
@@ -49,17 +55,20 @@ public class AbilityChipItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
 
-        BaseAbility stackAbility = getAbility(stack, context.level());
+        if (context.level() != null) {
 
-        if(stackAbility == null) {
-            tooltipComponents.add(Component.literal("ERROR UNKNOWN ABILITY").withStyle(ChatFormatting.DARK_RED));
-        } else {
-            tooltipComponents.add(Component.literal("Using will add: ").withStyle(ChatFormatting.DARK_PURPLE));
-            tooltipComponents.add(stackAbility.getName());
+            BaseAbility stackAbility = getAbility(stack, context.level());
+
+
+            if (stackAbility == null) {
+                tooltipComponents.add(Component.literal("ERROR UNKNOWN ABILITY").withStyle(ChatFormatting.DARK_RED));
+            } else {
+                tooltipComponents.add(stackAbility.getName());
+            }
+
+
+            super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         }
-
-
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 
     @Nullable

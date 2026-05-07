@@ -6,6 +6,7 @@ import net.mc3699.provenance.registry.ProvArchetypes;
 import net.mc3699.provenance.registry.ProvComponents;
 import net.mc3699.provenance.registry.ProvCreativeTabs;
 import net.mc3699.provenance.util.ProvScheduler;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.ModContainer;
@@ -13,6 +14,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.registries.*;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 @Mod(Provenance.MODID)
@@ -26,6 +28,10 @@ public class Provenance {
         ProvComponents.register(modEventBus);
         ProvItems.register(modEventBus);
         ProvCreativeTabs.register(modEventBus);
+    }
+
+    public static ResourceLocation path(String location) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, location);
     }
 
     private void registerRegistries(NewRegistryEvent event)

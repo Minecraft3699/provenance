@@ -2,6 +2,7 @@ package net.mc3699.provenance.registry;
 
 import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceRegistries;
+import net.mc3699.provenance.ability.foundation.AmbientAbility;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.item.ProvItems;
 import net.minecraft.core.HolderLookup;
@@ -24,9 +25,11 @@ public class ProvCreativeTabs {
         abilityRegistry.listElements().forEach(holder -> {
             ItemStack stack = new ItemStack(ProvItems.ABILITY_CHIP.get());
 
-            stack.set(ProvComponents.ABILITY_ID.get(), holder.key().location());
+            if(!(holder.value() instanceof AmbientAbility)) {
+                stack.set(ProvComponents.ABILITY_ID.get(), holder.key().location());
+                output.accept(stack);
+            }
 
-            output.accept(stack);
         });
 
     })).build());
@@ -35,7 +38,11 @@ public class ProvCreativeTabs {
     private static ItemStack makeIcon() {
         ItemStack stack = new ItemStack(ProvItems.ABILITY_CHIP.get());
 
-        ProvAbilities.ABILITIES.getEntries().stream().findFirst().ifPresent(holder -> stack.set(ProvComponents.ABILITY_ID.get(), holder.getId()));
+        ProvAbilities.ABILITIES.getEntries().stream().findFirst().ifPresent(holder -> {
+            if(!(holder.get() instanceof AmbientAbility)) {
+                stack.set(ProvComponents.ABILITY_ID.get(), holder.getId());
+            }
+        });
 
         return stack;
     }

@@ -15,7 +15,7 @@ public class AbilityExecutor {
         ResourceLocation abilityId = payload.abilityId();
 
         BaseAbility ability = ProvenanceDataHandler.getAbility(player, abilityId);
-        if (ability == null || !ability.canExecute(player)) return;
+        if (ability == null || !ability.canExecute(player) || !ProvenanceDataHandler.getAbilities(player).contains(ability)) return;
 
         if (ability instanceof ToggleAbility toggle) {
             boolean enabled = ProvenanceDataHandler.isAbilityEnabled(player, abilityId);

@@ -2,6 +2,8 @@ package net.mc3699.provenance.registry;
 
 import net.mc3699.provenance.Provenance;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -19,6 +21,9 @@ public class ProvComponents {
                             .networkSynchronized(ResourceLocation.STREAM_CODEC)
                             .build()
             );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> PROVENANCE_MODIFIED =
+            COMPONENTS.register("modified", () -> DataComponentType.<Boolean>builder().networkSynchronized(ByteBufCodecs.BOOL).build());
 
     public static void register(IEventBus bus) {
         COMPONENTS.register(bus);

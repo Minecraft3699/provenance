@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "provenance:item/ability_chip"
+    "layer0": "provenance:item/ability_chip_base",
+    "layer1": "provenance:item/ability_chip_tint"
   }
 }

@@ -52,6 +52,11 @@ public class CodRainAbility extends ToggleAbility {
     }
 
     @Override
+    public int getColor() {
+        return 0xAA00AAFF;
+    }
+
+    @Override
     public float getUseCost() {
         return 0.05f;
     }

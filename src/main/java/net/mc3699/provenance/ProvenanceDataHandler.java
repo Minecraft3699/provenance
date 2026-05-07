@@ -4,6 +4,7 @@ import net.mc3699.provenance.ability.foundation.AmbientAbility;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.archetype.foundation.BaseArchetype;
 import net.mc3699.provenance.registry.ProvAbilities;
+import net.mc3699.provenance.registry.ProvArchetypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
