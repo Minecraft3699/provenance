@@ -27,14 +27,6 @@ public class ClientAbilityBarHandler {
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(ProvKeymappings.ABILITY_BAR_KEY);
-        event.register(ProvKeymappings.ABILITY_1_KEY);
-        event.register(ProvKeymappings.ABILITY_2_KEY);
-        event.register(ProvKeymappings.ABILITY_3_KEY);
-        event.register(ProvKeymappings.ABILITY_4_KEY);
-        event.register(ProvKeymappings.ABILITY_5_KEY);
-        event.register(ProvKeymappings.ABILITY_6_KEY);
-        event.register(ProvKeymappings.ABILITY_7_KEY);
-        event.register(ProvKeymappings.ABILITY_8_KEY);
     }
 
     @SubscribeEvent
@@ -61,26 +53,5 @@ public class ClientAbilityBarHandler {
         }
 
         prevBarKey = barKeyDown;
-
-        boolean[] current = {
-                ProvKeymappings.ABILITY_1_KEY.isDown(),
-                ProvKeymappings.ABILITY_2_KEY.isDown(),
-                ProvKeymappings.ABILITY_3_KEY.isDown(),
-                ProvKeymappings.ABILITY_4_KEY.isDown(),
-                ProvKeymappings.ABILITY_5_KEY.isDown(),
-                ProvKeymappings.ABILITY_6_KEY.isDown(),
-                ProvKeymappings.ABILITY_7_KEY.isDown(),
-                ProvKeymappings.ABILITY_8_KEY.isDown()
-        };
-
-        if (RadialMenuState.entries != null) {
-            for (int i = 0; i < Math.min(8, RadialMenuState.entries.size()); i++) {
-                if (current[i] && !prevAbilityKeys[i]) {
-                    ResourceLocation id = RadialMenuState.entries.get(i).id();
-                    PacketDistributor.sendToServer(new TriggerAbilityPayload(id));
-                }
-                prevAbilityKeys[i] = current[i];
-            }
-        }
     }
 }

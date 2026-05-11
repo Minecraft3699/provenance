@@ -18,7 +18,7 @@ public class ProvCreativeTabs {
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Provenance.MODID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ABILITIES = CREATIVE_TABS.register("abilities", () -> CreativeModeTab.builder().title(Component.literal("Abilities")).icon(ProvCreativeTabs::makeIcon).displayItems(((itemDisplayParameters, output) -> {
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ABILITIES = CREATIVE_TABS.register("abilities", () -> CreativeModeTab.builder().withSearchBar().title(Component.literal("Abilities")).icon(ProvCreativeTabs::makeIcon).displayItems(((itemDisplayParameters, output) -> {
 
         HolderLookup.RegistryLookup<BaseAbility> abilityRegistry = itemDisplayParameters.holders().lookup(ProvenanceRegistries.ABILITY).orElseThrow();
 
