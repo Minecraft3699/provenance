@@ -237,6 +237,94 @@ public class ClientAbilityBarRenderHandler {
         graphics.fill(x, y + offsetY, x + 16, y + 16, 0x80FFFFFF);
     }
 
+    private static final java.util.Map<ResourceLocation, Float> HUD_ANIMATIONS = new java.util.HashMap<>();
+    private static final java.util.Map<ResourceLocation, Float> HUD_X_OFFSETS = new java.util.HashMap<>();
+    private static final java.util.List<ResourceLocation> EXITING_IDS = new java.util.ArrayList<>();
+
+    @SubscribeEvent
+    public static void onRenderHUD(RenderGuiLayerEvent.Pre event) {
+        if (!event.getName().equals(VanillaGuiLayers.CHAT)) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        GuiGraphics graphics = event.getGuiGraphics();
+        CompoundTag data = ClientAbilityInfo.clientData;
+
+        if (data == null || !data.contains("abilities")) return;
+
+        List<AbilityEntry> allAbilities = fetchAbilities(data);
+        float delta = mc.getTimer().getGameTimeDeltaTicks() * 0.1f;
+        float lerpSpeed = mc.getTimer().getGameTimeDeltaTicks() * 0.2f;
+
+        List<ResourceLocation> activeIds = allAbilities.stream()
+                .filter(entry -> {
+                    int cooldown = data.getInt("cooldown_" + entry.id());
+                    boolean isToggleEnabled = (entry.ability() instanceof ToggleAbility && entry.enabled());
+                    return cooldown > 0 || isToggleEnabled;
+                })
+                .map(AbilityEntry::id)
+                .toList();
+
+        for (AbilityEntry entry : allAbilities) {
+            ResourceLocation id = entry.id();
+            float currentAnim = HUD_ANIMATIONS.getOrDefault(id, 0f);
+
+            if (activeIds.contains(id)) {
+                EXITING_IDS.remove(id);
+                HUD_ANIMATIONS.put(id, Math.min(1.0f, currentAnim + delta));
+            } else {
+                if (currentAnim > 0f && !EXITING_IDS.contains(id)) EXITING_IDS.add(id);
+                HUD_ANIMATIONS.put(id, Math.max(0.0f, currentAnim - delta));
+                if (HUD_ANIMATIONS.get(id) <= 0f) {
+                    EXITING_IDS.remove(id);
+                    HUD_X_OFFSETS.remove(id);
+                }
+            }
+        }
+
+        int screenHeight = mc.getWindow().getGuiScaledHeight();
+        int yBase = screenHeight - 40;
+        int xBase = 10;
+        int spacing = 20;
+        int targetIndex = 0;
+
+        for (AbilityEntry entry : allAbilities) {
+            ResourceLocation id = entry.id();
+            float anim = HUD_ANIMATIONS.getOrDefault(id, 0f);
+            if (anim <= 0f) continue;
+
+            float ease = anim * anim * (3.0f - 2.0f * anim);
+
+            float targetX = targetIndex * spacing;
+            float currentX = HUD_X_OFFSETS.getOrDefault(id, targetX);
+
+            currentX = currentX + (targetX - currentX) * lerpSpeed;
+            HUD_X_OFFSETS.put(id, currentX);
+
+            float yPos;
+            if (EXITING_IDS.contains(id)) {
+                yPos = yBase + (60 * (1.0f - ease));
+            } else {
+                yPos = yBase + (30 * (1.0f - ease));
+                targetIndex++;
+            }
+
+            graphics.pose().pushPose();
+            graphics.pose().translate(xBase + currentX, yPos, 0);
+            graphics.setColor(1f, 1f, 1f, ease);
+
+            renderAbilityIcon(graphics, entry.ability().getIcon(), 0, 0, entry.enabled());
+
+            int cooldown = data.getInt("cooldown_" + entry.id());
+            if (cooldown > 0) {
+                float progress = (float) cooldown / Math.max(1f, entry.ability().getCooldown());
+                renderCooldownOverlay(graphics, 0, 0, progress);
+            }
+
+            graphics.setColor(1f, 1f, 1f, 1f);
+            graphics.pose().popPose();
+        }
+    }
+
     public record AbilityEntry(ResourceLocation id, boolean enabled, BaseAbility ability) {
     }
 }

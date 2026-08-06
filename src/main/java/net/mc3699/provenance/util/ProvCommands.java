@@ -1,6 +1,7 @@
 package net.mc3699.provenance.util;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.archetype.foundation.BaseArchetype;
@@ -20,6 +21,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Collection;
 
 @EventBusSubscriber(modid = Provenance.MODID)
 public class ProvCommands {
@@ -46,10 +49,7 @@ public class ProvCommands {
                                                     }
 
                                                     ProvenanceDataHandler.addAbility(player, id);
-
-                                                    CompoundTag abilities = player.getPersistentData()
-                                                            .getCompound(ProvenanceDataHandler.ABILITY_TAG);
-                                                    PacketDistributor.sendToPlayer(player, new AbilityDataSyncPayload(abilities.copy()));
+                                                    syncData(player);
 
                                                     ctx.getSource().sendSuccess(
                                                             () -> Component.literal("Added ability " + id + " to " + player.getName().getString()),
@@ -57,7 +57,6 @@ public class ProvCommands {
                                                     );
                                                     return 1;
                                                 }))))
-
 
                         .then(Commands.literal("remove")
                                 .then(Commands.argument("player", EntityArgument.player())
@@ -68,10 +67,7 @@ public class ProvCommands {
                                                     ResourceLocation id = ResourceLocationArgument.getId(ctx, "ability");
 
                                                     ProvenanceDataHandler.removeAbility(player, id);
-
-                                                    CompoundTag abilities = player.getPersistentData()
-                                                            .getCompound(ProvenanceDataHandler.ABILITY_TAG);
-                                                    PacketDistributor.sendToPlayer(player, new AbilityDataSyncPayload(abilities.copy()));
+                                                    syncData(player);
 
                                                     ctx.getSource().sendSuccess(
                                                             () -> Component.literal("Removed ability " + id + " from " + player.getName().getString()),
@@ -105,10 +101,7 @@ public class ProvCommands {
                                                     }
 
                                                     ProvenanceDataHandler.applyArchetype(player, archetype);
-
-                                                    CompoundTag abilities = player.getPersistentData()
-                                                            .getCompound(ProvenanceDataHandler.ABILITY_TAG);
-                                                    PacketDistributor.sendToPlayer(player, new AbilityDataSyncPayload(abilities.copy()));
+                                                    syncData(player);
 
                                                     ctx.getSource().sendSuccess(
                                                             () -> Component.literal(
@@ -122,5 +115,111 @@ public class ProvCommands {
                                                     return 1;
                                                 }))))
         );
+
+        dispatcher.register(
+                Commands.literal("pxp")
+                        .requires(src -> src.hasPermission(2))
+
+                        .then(Commands.literal("add")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                                .executes(ctx -> {
+                                                    Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
+                                                    int amount = IntegerArgumentType.getInteger(ctx, "amount");
+
+                                                    for (ServerPlayer target : targets) {
+                                                        ProvenanceDataHandler.addXP(target, amount);
+                                                        syncData(target);
+                                                    }
+
+                                                    if (targets.size() == 1) {
+                                                        ServerPlayer target = targets.iterator().next();
+                                                        ctx.getSource().sendSuccess(
+                                                                () -> Component.literal("Added " + amount + " XP to " + target.getName().getString()),
+                                                                true
+                                                        );
+                                                    } else {
+                                                        ctx.getSource().sendSuccess(
+                                                                () -> Component.literal("Added " + amount + " XP to " + targets.size() + " players"),
+                                                                true
+                                                        );
+                                                    }
+                                                    return targets.size();
+                                                }))))
+
+                        .then(Commands.literal("remove")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                                .executes(ctx -> {
+                                                    Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
+                                                    int amount = IntegerArgumentType.getInteger(ctx, "amount");
+
+                                                    for (ServerPlayer target : targets) {
+                                                        ProvenanceDataHandler.addXP(target, -amount);
+                                                        syncData(target);
+                                                    }
+
+                                                    if (targets.size() == 1) {
+                                                        ServerPlayer target = targets.iterator().next();
+                                                        ctx.getSource().sendSuccess(
+                                                                () -> Component.literal("Removed " + amount + " XP from " + target.getName().getString()),
+                                                                true
+                                                        );
+                                                    } else {
+                                                        ctx.getSource().sendSuccess(
+                                                                () -> Component.literal("Removed " + amount + " XP from " + targets.size() + " players"),
+                                                                true
+                                                        );
+                                                    }
+                                                    return targets.size();
+                                                }))))
+
+                        .then(Commands.literal("set")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(0))
+                                                .executes(ctx -> {
+                                                    Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
+                                                    int newXp = IntegerArgumentType.getInteger(ctx, "amount");
+
+                                                    for (ServerPlayer target : targets) {
+                                                        int currentXp = ProvenanceDataHandler.getXP(target);
+                                                        int delta = newXp - currentXp;
+                                                        ProvenanceDataHandler.addXP(target, delta);
+                                                        syncData(target);
+                                                    }
+
+                                                    if (targets.size() == 1) {
+                                                        ServerPlayer target = targets.iterator().next();
+                                                        ctx.getSource().sendSuccess(
+                                                                () -> Component.literal("Set XP for " + target.getName().getString() + " to " + newXp),
+                                                                true
+                                                        );
+                                                    } else {
+                                                        ctx.getSource().sendSuccess(
+                                                                () -> Component.literal("Set XP for " + targets.size() + " players to " + newXp),
+                                                                true
+                                                        );
+                                                    }
+                                                    return targets.size();
+                                                }))))
+
+                        .then(Commands.literal("get")
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .executes(ctx -> {
+                                            ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
+                                            int xp = ProvenanceDataHandler.getXP(player);
+
+                                            ctx.getSource().sendSuccess(
+                                                    () -> Component.literal(player.getName().getString() + " has " + xp + " XP"),
+                                                    false
+                                            );
+                                            return xp;
+                                        })))
+        );
+    }
+
+    private static void syncData(ServerPlayer player) {
+        CompoundTag abilities = player.getPersistentData().getCompound(ProvenanceDataHandler.ABILITY_TAG);
+        PacketDistributor.sendToPlayer(player, new AbilityDataSyncPayload(abilities.copy()));
     }
 }

@@ -3,6 +3,7 @@ package net.mc3699.provenance;
 import net.mc3699.provenance.ability.foundation.AmbientAbility;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.archetype.foundation.BaseArchetype;
+import net.mc3699.provenance.archetype.foundation.leveling.LevelingArchetype;
 import net.mc3699.provenance.registry.ProvAbilities;
 import net.mc3699.provenance.registry.ProvArchetypes;
 import net.minecraft.nbt.CompoundTag;
@@ -23,6 +24,68 @@ public class ProvenanceDataHandler {
 
     private static final Map<UUID, Map<ResourceLocation, BaseAbility>> playerAbilities = new HashMap<>();
     private static final Map<UUID, Map<ResourceLocation, BaseAbility>> playerAmbientAbilities = new HashMap<>();
+
+    public static int getXP(Player player)
+    {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        return data.getInt("xp");
+    }
+
+    public static void setXP(Player player, int xp)
+    {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        data.putInt("xp", Math.max(0, xp));
+        player.getPersistentData().put(ABILITY_TAG, data);
+    }
+
+    public static void addXP(Player player, int amount) {
+        BaseArchetype currentArchetype = getArchetype(player);
+        if(currentArchetype == null) return;
+
+        int oldXP = getXP(player);
+        int newXP = oldXP + amount;
+        setXP(player, newXP);
+
+        if(currentArchetype instanceof LevelingArchetype levelingArchetype)
+        {
+            int oldLevel = levelingArchetype.getArchetypeLevel(oldXP).level();
+            int newLevel = levelingArchetype.getArchetypeLevel(newXP).level();
+
+            if(newLevel != oldLevel)
+            {
+                syncArchetypeForXP(player, levelingArchetype, newXP);
+            }
+        }
+    }
+
+    public static void syncArchetypeForXP(Player player, LevelingArchetype levelingArchetype, int xp)
+    {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+
+        // active
+        ListTag activeAbilityList = new ListTag();
+        Set<ResourceLocation> levelActiveAbilities = levelingArchetype.getActiveAbilitiesForXP(xp);
+        for(ResourceLocation id : levelActiveAbilities) {
+            activeAbilityList.add(StringTag.valueOf(id.toString()));
+        }
+        data.put("abilities", activeAbilityList);
+
+        // ambient
+        ListTag ambientAbilityList = new ListTag();
+        List<AmbientAbility> levelAmbientAbilities = levelingArchetype.getAmbientAbilitiesForXP(xp);
+        for(AmbientAbility ability : levelAmbientAbilities)
+        {
+            ResourceLocation id = ProvenanceRegistries.ABILITY_REGISTRY.getKey(ability);
+            if(id != null)
+            {
+                ambientAbilityList.add(StringTag.valueOf(id.toString()));
+            }
+        }
+        data.put("ambient", ambientAbilityList);
+
+        player.getPersistentData().put(ABILITY_TAG, data);
+        removePlayerAbilities(player);
+    }
 
     public static void changeAP(Player player, float amount) {
         CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
@@ -45,6 +108,8 @@ public class ProvenanceDataHandler {
         player.getPersistentData().put(ABILITY_TAG, data);
         playerAbilities.remove(player.getUUID());
     }
+
+
 
     public static void removeAbility(Player player, ResourceLocation id) {
         CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
@@ -161,27 +226,61 @@ public class ProvenanceDataHandler {
         return false;
     }
 
+    public static BaseArchetype getArchetype(Player player)
+    {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        if(!data.contains("archetype")) return null;
+
+        ResourceLocation id = ResourceLocation.tryParse(data.getString("archetype"));
+        if(id == null) return null;
+
+        return ProvenanceRegistries.ARCHETYPE_REGISTRY.get(id);
+    }
+
     public static void applyArchetype(Player player, BaseArchetype archetype) {
         CompoundTag data = new CompoundTag();
         data.putFloat("action_points", MAX_AP);
+        data.putInt("xp", 0);
+
+        ResourceLocation archetypeID = ProvenanceRegistries.ARCHETYPE_REGISTRY.getKey(archetype);
+        if(archetypeID != null)
+        {
+            data.putString("archetype", archetypeID.toString());
+        }
 
         ListTag abilityList = new ListTag();
-        if (archetype.getGrantedAbilities() != null) {
-            for (ResourceLocation id : archetype.getGrantedAbilities()) {
+        ListTag ambientList = new ListTag();
+
+        if (archetype instanceof LevelingArchetype levelingArchetype) {
+            Set<ResourceLocation> granted = levelingArchetype.getActiveAbilitiesForXP(0);
+            for (ResourceLocation id : granted) {
                 abilityList.add(StringTag.valueOf(id.toString()));
             }
-        }
-        data.put("abilities", abilityList);
 
-        ListTag ambientList = new ListTag();
-        if (archetype.getAmbientAbilities() != null) {
-            for (AmbientAbility ability : archetype.getAmbientAbilities()) {
-                ResourceLocation id = ProvAbilities.ABILITIES.getRegistry().get().getKey(ability);
+            List<AmbientAbility> ambient = levelingArchetype.getAmbientAbilitiesForXP(0);
+            for (AmbientAbility ability : ambient) {
+                ResourceLocation id = ProvenanceRegistries.ABILITY_REGISTRY.getKey(ability);
                 if (id != null) {
                     ambientList.add(StringTag.valueOf(id.toString()));
                 }
             }
+        } else {
+            if (archetype.getGrantedAbilities() != null) {
+                for (ResourceLocation id : archetype.getGrantedAbilities()) {
+                    abilityList.add(StringTag.valueOf(id.toString()));
+                }
+            }
+            if (archetype.getAmbientAbilities() != null) {
+                for (AmbientAbility ability : archetype.getAmbientAbilities()) {
+                    ResourceLocation id = ProvAbilities.ABILITIES.getRegistry().get().getKey(ability);
+                    if (id != null) {
+                        ambientList.add(StringTag.valueOf(id.toString()));
+                    }
+                }
+            }
         }
+
+        data.put("abilities", abilityList);
         data.put("ambient", ambientList);
 
         player.getPersistentData().put(ABILITY_TAG, data);

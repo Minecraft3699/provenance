@@ -30,7 +30,7 @@ public class TestAbility extends BaseAbility {
 
     @Override
     public int getCooldown() {
-        return 0;
+        return 40;
     }
 
     @Override

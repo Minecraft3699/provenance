@@ -3,6 +3,7 @@ package net.mc3699.provenance.registry;
 import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceRegistries;
 import net.mc3699.provenance.archetype.archetypes.HumanArchetype;
+import net.mc3699.provenance.archetype.archetypes.LevelingTestArchetype;
 import net.mc3699.provenance.archetype.archetypes.TestArchetype;
 import net.mc3699.provenance.archetype.foundation.BaseArchetype;
 import net.neoforged.bus.api.IEventBus;
@@ -18,6 +19,8 @@ public class ProvArchetypes {
     public static final Supplier<BaseArchetype> HUMAN = ARCHETYPES.register("human", HumanArchetype::new);
 
     public static final Supplier<BaseArchetype> TEST = ARCHETYPES.register("test", TestArchetype::new);
+
+    public static final Supplier<BaseArchetype> LEVELING_TEST = ARCHETYPES.register("leveling_test", LevelingTestArchetype::new);
 
     public static void register(IEventBus eventBus)
     {
