@@ -5,6 +5,10 @@ import net.mc3699.provenance.util.ProvConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
+
+import java.util.function.Supplier;
 
 public abstract class BaseAbility {
 
@@ -14,36 +18,30 @@ public abstract class BaseAbility {
 
     public abstract Component getName();
 
-    public void execute(ServerPlayer player)
-    {
-        ProvenanceDataHandler.changeAP(player, -getUseCost());
-    }
+    public abstract void execute(ServerPlayer player);
 
     public abstract boolean canExecute(ServerPlayer player);
 
-    public void backgroundTick(ServerPlayer serverPlayer) {
-
-    }
+    public void backgroundTick(ServerPlayer serverPlayer) {}
 
     public int getColor() {
         return 0xFFFF00FF;
     }
 
-    public String getAnimation() {
+    public Supplier<Object> getRenderSupplier() {
+        return null;
+    }
+
+    public Object getClientRenderer() {
+        if(FMLEnvironment.dist == Dist.CLIENT && getRenderSupplier() != null) {
+            return getRenderSupplier().get();
+        }
         return null;
     }
 
     public ResourceLocation getIcon()
     {
         return ProvConstants.path("textures/ability/missing.png");
-    }
-
-    public BaseAbility createNew() {
-        try {
-            return this.getClass().getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

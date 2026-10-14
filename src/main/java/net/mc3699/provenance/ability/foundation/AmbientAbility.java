@@ -10,4 +10,9 @@ public abstract class AmbientAbility extends BaseAbility {
     public float getUseCost() {
         return 0;
     }
+
+    @Override
+    public void execute(ServerPlayer player) {
+        // does nothing
+    }
 }

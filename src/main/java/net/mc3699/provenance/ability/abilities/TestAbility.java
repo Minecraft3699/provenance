@@ -5,6 +5,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.function.Supplier;
+
 public class TestAbility extends BaseAbility {
     @Override
     public float getUseCost() {
@@ -23,18 +25,11 @@ public class TestAbility extends BaseAbility {
 
     @Override
     public void execute(ServerPlayer player) {
-        super.execute(player);
         player.sendSystemMessage(Component.literal("Triggered Test Ability"));
-        PacketDistributor.sendToPlayer(player, new OpenScreenPayload("null"));
     }
 
     @Override
     public int getCooldown() {
         return 40;
-    }
-
-    @Override
-    public String getAnimation() {
-        return "test";
     }
 }

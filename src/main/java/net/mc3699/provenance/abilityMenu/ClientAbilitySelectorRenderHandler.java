@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @EventBusSubscriber(value = Dist.CLIENT)
-public class ClientAbilityBarRenderHandler {
+public class ClientAbilitySelectorRenderHandler {
 
     private static final ResourceLocation AP_BAR_EMPTY = ProvConstants.path("textures/gui/ap_bar_empty.png");
     private static final ResourceLocation AP_BAR_FULL = ProvConstants.path("textures/gui/ap_bar_full.png");
@@ -59,7 +59,7 @@ public class ClientAbilityBarRenderHandler {
     @SubscribeEvent
     public static void onMouseInput(InputEvent.MouseButton.Pre event) {
         if (event.getAction() != InputConstants.PRESS) return;
-        if (!ClientAbilityBarHandler.isActive() || animationTimer < 1.0f) return;
+        if (!ClientAbilitySelectorRenderer.isActive() || animationTimer < 1.0f) return;
 
         int hovered = RadialMenuState.hoveredIndex;
         if (hovered < 0 || hovered >= RadialMenuState.entries.size()) return;
@@ -100,7 +100,7 @@ public class ClientAbilityBarRenderHandler {
 
         if (!event.getName().equals(VanillaGuiLayers.HOTBAR)) return;
 
-        boolean active = ClientAbilityBarHandler.isActive();
+        boolean active = ClientAbilitySelectorRenderer.isActive();
         float delta = mc.getTimer().getGameTimeDeltaTicks() * 0.15f;
 
         if (active) {

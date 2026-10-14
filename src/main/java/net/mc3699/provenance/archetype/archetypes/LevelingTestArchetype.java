@@ -24,7 +24,7 @@ public class LevelingTestArchetype extends LevelingArchetype {
                 new ArchetypeLevel(
                         1,
                         100,
-                        Set.of(Provenance.path("cod_rain"), Provenance.path("test_ability")),
+                        Set.of(Provenance.path("cod_rain"), Provenance.path("test")),
                         List.of(ProvAbilities.CARNIVORE_FOOD.get())
                 )
         );

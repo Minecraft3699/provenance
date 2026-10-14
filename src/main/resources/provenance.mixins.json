@@ -4,6 +4,7 @@
   "package": "net.mc3699.provenance.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ItemMixin"
   ],
   "client": [
   ],

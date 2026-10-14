@@ -14,7 +14,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(value = Dist.CLIENT)
-public class ClientAbilityBarHandler {
+public class ClientAbilitySelectorRenderer {
 
     private static boolean abilityBarActive = false;
     private static boolean prevBarKey = false;

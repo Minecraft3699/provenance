@@ -76,10 +76,8 @@ neoForge {
 sourceSets.main.get().resources { srcDir("src/generated/resources") }
 
 dependencies {
-
     //implementation("maven.modrinth:ldlib:mc1.21.1-2.1.7-neoforge")
     //compileOnly("org.appliedenergistics.yoga:yoga:1.0.0")
-
 }
 
 val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata") {

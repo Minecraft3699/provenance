@@ -34,6 +34,7 @@ public class ProvNetworking {
                 PlayerSyncHandler::handleSyncRequests
         );
 
+
         registrar.playToClient(
                 OpenScreenPayload.TYPE,
                 OpenScreenPayload.CODEC,

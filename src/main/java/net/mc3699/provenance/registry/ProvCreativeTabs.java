@@ -20,7 +20,7 @@ public class ProvCreativeTabs {
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ABILITIES = CREATIVE_TABS.register("abilities", () -> CreativeModeTab.builder().withSearchBar().title(Component.literal("Abilities")).icon(ProvCreativeTabs::makeIcon).displayItems(((itemDisplayParameters, output) -> {
 
-        HolderLookup.RegistryLookup<BaseAbility> abilityRegistry = itemDisplayParameters.holders().lookup(ProvenanceRegistries.ABILITY).orElseThrow();
+        HolderLookup.RegistryLookup<BaseAbility> abilityRegistry = itemDisplayParameters.holders().lookup(ProvenanceRegistries.ABILITY_KEY).orElseThrow();
 
         abilityRegistry.listElements().forEach(holder -> {
             ItemStack stack = new ItemStack(ProvItems.ABILITY_CHIP.get());

@@ -1,9 +1,7 @@
 package net.mc3699.provenance.item;
 
-import net.mc3699.provenance.Provenance;
 import net.mc3699.provenance.ProvenanceDataHandler;
 import net.mc3699.provenance.ProvenanceRegistries;
-import net.mc3699.provenance.ability.foundation.AmbientAbility;
 import net.mc3699.provenance.ability.foundation.BaseAbility;
 import net.mc3699.provenance.registry.ProvComponents;
 import net.minecraft.ChatFormatting;
@@ -24,7 +22,6 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class AbilityChipItem extends Item {
     public AbilityChipItem(Properties properties) {
@@ -82,7 +79,7 @@ public class AbilityChipItem extends Item {
         if(packetListener != null) {
             var registry = packetListener
                     .registryAccess()
-                    .registry(ProvenanceRegistries.ABILITY);
+                    .registry(ProvenanceRegistries.ABILITY_KEY);
 
             if(registry.isPresent()) {
                 BaseAbility ability = registry.get().get(id);
@@ -99,6 +96,6 @@ public class AbilityChipItem extends Item {
     public static BaseAbility getAbility(ItemStack stack, Level level) {
         ResourceLocation id = stack.get(ProvComponents.ABILITY_ID);
         if(id == null) return null;
-        return level.registryAccess().registryOrThrow(ProvenanceRegistries.ABILITY).get(id);
+        return level.registryAccess().registryOrThrow(ProvenanceRegistries.ABILITY_KEY).get(id);
     }
 }

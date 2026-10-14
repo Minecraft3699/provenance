@@ -59,7 +59,7 @@ public class AbilityKeybindScreen extends Screen {
 
         g.drawCenteredString(this.font, "Binding Ability...", cx, cy - 20, 0xFFCC00);
         g.drawCenteredString(this.font, "Press any Key or Mouse Button", cx, cy, 0xFFFFFF);
-        g.drawCenteredString(this.font, "Right-Click to Clear Binding", cx, cy + 20, 0xAAAAAA);
+        g.drawCenteredString(this.font, "Right Click to Clear Binding", cx, cy + 20, 0xAAAAAA);
         g.drawCenteredString(this.font, "ESC to Cancel", cx, cy + 40, 0xAAAAAA);
 
         super.render(g, mouseX, mouseY, partialTick);

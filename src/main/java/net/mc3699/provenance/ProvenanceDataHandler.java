@@ -110,7 +110,6 @@ public class ProvenanceDataHandler {
     }
 
 
-
     public static void removeAbility(Player player, ResourceLocation id) {
         CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         ListTag list = data.getList("abilities", Tag.TAG_STRING);
@@ -162,6 +161,18 @@ public class ProvenanceDataHandler {
     public static int getCooldown(Player player, ResourceLocation id) {
         CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
         return data.contains("cooldown_" + id) ? data.getInt("cooldown_" + id) : 0;
+    }
+
+    public static void setTemporary(Player player, ResourceLocation id, boolean value)
+    {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        data.putBoolean("temporary_" + id, value);
+        player.getPersistentData().put(ABILITY_TAG, data);
+    }
+
+    public static boolean getTemporary(Player player, ResourceLocation id) {
+        CompoundTag data = player.getPersistentData().getCompound(ABILITY_TAG);
+        return data.contains("temporary_"+id);
     }
 
     public static boolean isOnCooldown(Player player, ResourceLocation id) {

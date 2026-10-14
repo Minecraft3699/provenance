@@ -6,6 +6,7 @@ import net.mc3699.provenance.ability.foundation.ToggleAbility;
 import net.mc3699.provenance.network.TriggerAbilityPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class AbilityExecutor {
@@ -16,6 +17,7 @@ public class AbilityExecutor {
 
         BaseAbility ability = ProvenanceDataHandler.getAbility(player, abilityId);
         if (ability == null || !ability.canExecute(player) || !ProvenanceDataHandler.getAbilities(player).contains(ability)) return;
+
 
         if (ability instanceof ToggleAbility toggle) {
             boolean enabled = ProvenanceDataHandler.isAbilityEnabled(player, abilityId);
@@ -29,6 +31,7 @@ public class AbilityExecutor {
                     && !ProvenanceDataHandler.isOnCooldown(player, abilityId)) {
 
                 ability.execute(player);
+                ProvenanceDataHandler.changeAP(player, -ability.getUseCost());
                 ProvenanceDataHandler.setCooldown(player, abilityId, ability.getCooldown());
             }
         }

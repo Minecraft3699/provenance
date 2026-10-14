@@ -17,7 +17,6 @@ public class CodRainAbility extends ToggleAbility {
     @Override
     public void execute(ServerPlayer player) {
         timer = 0;
-        super.execute(player);
     }
 
     @Override
@@ -69,10 +68,5 @@ public class CodRainAbility extends ToggleAbility {
     @Override
     public Component getName() {
         return Component.literal("Cod Rain");
-    }
-
-    @Override
-    public String getAnimation() {
-        return "cod_rain";
     }
 }
